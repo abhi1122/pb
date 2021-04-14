@@ -1,0 +1,16 @@
+// @import '../../../styles/app';
+
+.root {
+}
+
+.mainTableWidget {
+  :global {
+    .table td {
+      border: none;
+    }
+  }
+}
+
+button.btn-alignment.btn.btn-outline-success {
+  float: right !important;
+}
