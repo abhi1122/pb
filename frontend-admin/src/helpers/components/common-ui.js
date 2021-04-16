@@ -11,6 +11,7 @@ export const SectionHeader = ({
   headButtonName,
   headButtonUrl,
   props,
+  buttonState = {},
 }) => {
   return (
     <div>
@@ -20,7 +21,9 @@ export const SectionHeader = ({
       <Button
         outline
         color='success'
-        onClick={() => props.history.push(headButtonUrl)}
+        onClick={() =>
+          props.history.push({ pathname: headButtonUrl, state: buttonState })
+        }
         style={{ float: 'right' }}
       >
         {headButtonName}

@@ -11,6 +11,8 @@ import {
   DropdownItem,
   Input,
   Label,
+  Breadcrumb,
+  BreadcrumbItem,
   Badge,
 } from 'reactstrap';
 import { getList } from '../../actions/category';
@@ -18,6 +20,7 @@ import { connect } from 'react-redux';
 import { withRouter, Redirect, Link } from 'react-router-dom';
 import Widget from '../../components/Widget/Widget';
 import { SectionHeader } from '../../helpers/components/common-ui';
+import { CloudImage } from '../../helpers/components/CloudImage';
 
 // import './index.module.scss';
 
@@ -27,16 +30,39 @@ class CategoryList extends React.Component {
 
     this.state = {
       tableStyles: [],
-      checkboxes1: [false, true, false, false],
-      checkboxes2: [false, false, false, false, false, false],
-      checkboxes3: [false, false, false, false, false, false],
+      parentId: null,
+      parentName: '',
+      parentSlugName: 'Business',
     };
 
     this.checkAll = this.checkAll.bind(this);
   }
 
   componentDidMount() {
-    this.props.dispatch(getList());
+    if (this.props.location.state && this.props.location.state.parentId) {
+      const { parentId, parentName } = this.props.location.state;
+      console.log(
+        'componentDidMount call....',
+        parentId,
+        parentName,
+        this.state.parentSlugName
+      );
+      const parentSlugName =
+        this.state.parentSlugName === '__blank'
+          ? parentName
+          : `${this.state.parentSlugName}__--${parentName}`;
+      console.log(parentSlugName, '.....parentSlugName');
+      this.setState(
+        {
+          parentId,
+          parentName,
+          parentSlugName: `${this.state.parentSlugName}__--${parentName}`,
+        },
+        () => this.props.dispatch(getList({ searchQuery: { parentId } }))
+      );
+    } else {
+      this.props.dispatch(getList({ searchQuery: { parentId: null } }));
+    }
   }
 
   parseDate(date) {
@@ -68,22 +94,58 @@ class CategoryList extends React.Component {
     });
   }
 
+  changeCategory(parentId, parentName) {
+    this.props.history.push({
+      pathname: `/admin/categories/list-child/${parentId}/${parentName}`,
+      state: {
+        parentId,
+        parentName,
+      },
+    });
+  }
+
   render() {
+    const { parentId, parentName, parentSlugName } = this.state;
     return (
       <div>
+        <Breadcrumb tag='nav' listTag='div'>
+          <BreadcrumbItem>Business</BreadcrumbItem>
+          {this.props.categories.relations.map((category) => (
+            <BreadcrumbItem>
+              <a
+                href='javascript:void(0)'
+                onClick={() =>
+                  this.props.history.push({
+                    pathname: `/admin/categories/list-child/${category._id}/${category.name}`,
+                    state: {
+                      parentId: category._id,
+                      parentName: category.name,
+                    },
+                  })
+                }
+              >
+                {category.name}
+              </a>
+            </BreadcrumbItem>
+          ))}
+        </Breadcrumb>
         <Row>
           <Col>
             <Widget>
               <SectionHeader
-                headName='Category List'
+                headName={`${
+                  this.state.parentName ? this.state.parentName : 'Business'
+                } List`}
                 headButtonName='+ Add Category'
-                headButtonUrl='/admin/categories/add'
+                headButtonUrl={`/admin/categories/add-child/${parentId}/${parentSlugName}`}
                 props={this.props}
+                buttonState={{ parentId, parentName }}
               />
               <Table striped>
                 <thead>
                   <tr className='fs-sm'>
                     <th className='hidden-sm-down'>#</th>
+                    <th>Image</th>
                     <th>Name</th>
                     <th>Dates</th>
                     <th>Status</th>
@@ -94,13 +156,58 @@ class CategoryList extends React.Component {
                   {this.props.categories.list.map((row) => (
                     <tr key={row['_id']}>
                       <td>{row['_id']}</td>
+                      <td>
+                        {row.file && (
+                          <CloudImage
+                            publicId={row.file.public_id}
+                            width='100'
+                            height='50'
+                          />
+                        )}
+                      </td>
                       <td>{row.name}</td>
                       <td>
                         {row.createdAt}
                         {row.UpdatedAt}
                       </td>
                       <td>{row.idDeleted}</td>
-                      <td></td>
+                      <td>
+                        {/* <a href='javascript:void(0)'>
+                          <Badge
+                            color='success'
+                            onClick={() =>
+                              this.props.history.push({
+                                pathname: `/admin/categories/add-child/${row._id}`,
+                                state: {
+                                  parentId: row._id,
+                                  parentName: row.name,
+                                },
+                              })
+                            }
+                          >
+                            + Add Category
+                          </Badge>
+                        </a> */}
+                        <a href='javascript:void(0)'>
+                          <Badge
+                            color='success'
+                            onClick={() =>
+                              this.props.history.push({
+                                pathname: `/admin/categories/list-child/${row._id}/${parentSlugName}`,
+                                state: {
+                                  parentId: row._id,
+                                  parentName: row.name,
+                                },
+                              })
+                            }
+                          >
+                            Manage Sub-Category
+                          </Badge>
+                        </a>
+                        <br />
+                        <Badge color='primary'>Edit</Badge>
+                        <Badge color='danger'>Active</Badge>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

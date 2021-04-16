@@ -26,7 +26,9 @@ function loadError(errors) {
 
 export function getList(query) {
   return async (dispatch) => {
-    const { data } = await callHttpRequest('post', 'categories/list', query);
+    const {
+      data: [data],
+    } = await callHttpRequest('post', 'categories/list', query);
     console.log(data, '.ppopodata.....poop.');
     dispatch(loadList(data));
   };

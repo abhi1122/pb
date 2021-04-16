@@ -10,6 +10,8 @@ import {
   Alert,
   InputGroupAddon,
   InputGroupText,
+  Breadcrumb,
+  BreadcrumbItem,
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import { withRouter, Redirect, Link } from 'react-router-dom';
@@ -26,12 +28,27 @@ import { getList, saveForm } from '../../actions/category';
 class CategoryAdd extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: '', fnt: {}, png: {}, fonts: [] };
+    this.state = {
+      name: '',
+      fnt: {},
+      png: {},
+      fonts: [],
+      parentName: '',
+      parentId: null,
+    };
   }
 
   componentDidMount() {
     if (this.props && this.props.match.params.id) {
-      this.props.dispatch(getList());
+      //this.props.dispatch(getList());
+    }
+
+    if (this.props.location.state && this.props.location.state.parentId) {
+      const { parentId, parentName } = this.props.location.state;
+      this.setState({
+        parentId,
+        parentName,
+      });
     }
   }
 
@@ -41,24 +58,60 @@ class CategoryAdd extends React.Component {
 
   save = (e) => {
     e.preventDefault();
-    this.props.dispatch(saveForm({ name: this.state.name }));
+    this.props.dispatch(
+      saveForm({ name: this.state.name, parentId: this.state.parentId })
+    );
   };
 
   render() {
+    const { parentId, parentName } = this.state;
     if (this.props.saved) {
-      return <Redirect to='/admin/categories' />;
+      //return <Redirect to='/admin/categories' />;
+      this.props.history.push({
+        pathname: `/admin/categories/list-child/${parentId}/${parentName}`,
+        state: {
+          parentId: parentId,
+          parentName: parentName,
+        },
+      });
     }
-    console.log(this.props.fonts, '...this.props.fonts');
+
+    console.log(
+      this.props.categories,
+      '...this.props.categoriescategoriescategories'
+    );
     return (
       <div>
+        <Breadcrumb tag='nav' listTag='div'>
+          <BreadcrumbItem>Business</BreadcrumbItem>
+          {this.props.categories.relations.map((category) => (
+            <BreadcrumbItem>
+              <a
+                href='javascript:void(0)'
+                onClick={() =>
+                  this.props.history.push({
+                    pathname: `/admin/categories/list-child/${category._id}/${category.name}`,
+                    state: {
+                      parentId: category._id,
+                      parentName: category.name,
+                    },
+                  })
+                }
+              >
+                {category.name}
+              </a>
+            </BreadcrumbItem>
+          ))}
+        </Breadcrumb>
         <Row>
           <Col>
             <Widget>
               <SectionHeader
-                headName='Add New Category'
+                headName={`Add New Sub Category for ${this.state.parentName}`}
                 headButtonName='Category List'
-                headButtonUrl='/admin/categories'
+                headButtonUrl={`/admin/categories/list-child/${parentId}/${this.state.parentName}`}
                 props={this.props}
+                buttonState={{ parentId, parentName }}
               />
               <p className='widget-auth-info'>Please fill all fields below.</p>
               <br />
@@ -118,6 +171,7 @@ function mapStateToProps(state) {
   return {
     saved: state.categories.saved,
     errors: state.categories.errors,
+    categories: state.categories,
   };
 }
 

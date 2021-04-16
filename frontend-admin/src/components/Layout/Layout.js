@@ -113,7 +113,15 @@ class Layout extends React.Component {
                       exact
                       component={CategoryAdd}
                     />
-                    <Route path='/admin/categories/:id' component={FontsAdd} />
+                    <Route
+                      path='/admin/categories/add-child/:id'
+                      component={CategoryAdd}
+                    />
+                    <Route
+                      key={Date.now()}
+                      path='/admin/categories/list-child/:id/:name'
+                      component={CategoryList}
+                    />
 
                     <Route
                       path='/admin/template/add'
