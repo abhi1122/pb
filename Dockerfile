@@ -1,8 +1,8 @@
 FROM ubuntu:latest
-# FROM node:10.16.0 AS ui-build
-# WORKDIR /usr/src/app
-# COPY frontend-admin/ ./frontend-admin/
-# RUN cd frontend-admin && npm install && npm run build
+FROM node:10.16.0 AS ui-build
+WORKDIR /usr/src/app
+COPY frontend-admin/ ./frontend-admin/
+RUN cd frontend-admin && npm install && npm run build
 
 FROM node:latest AS server-build
 WORKDIR /usr/src/app

@@ -33,12 +33,12 @@ var modalObj = new Categories();
  *             $ref: '#/definitions/catSaveResp'
  */
 router.post('/save', upload.none(), async (req, res, next) => {
-  try {
-    const response = await modalObj.save(req);
-    res.send(createResponse(response, req, res));
-  } catch (error) {
-    res.send(createError(error, res, res));
-  }
+  //try {
+  const response = await modalObj.save(req);
+  res.send(createResponse(response, req, res));
+  // } catch (error) {
+  //   res.send(createError(error, res, res));
+  // }
 });
 
 /**

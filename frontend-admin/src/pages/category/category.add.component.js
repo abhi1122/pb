@@ -14,16 +14,14 @@ import {
   BreadcrumbItem,
 } from 'reactstrap';
 import { connect } from 'react-redux';
-import { withRouter, Redirect, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import Widget from '../../components/Widget/Widget';
 import {
   InputValidationError,
   SectionHeader,
 } from '../../helpers/components/common-ui';
 
-import { getList, saveForm } from '../../actions/category';
-
-// import './index.module.scss';
+import { saveForm } from '../../actions/category';
 
 class CategoryAdd extends React.Component {
   constructor(props) {
@@ -66,7 +64,6 @@ class CategoryAdd extends React.Component {
   render() {
     const { parentId, parentName } = this.state;
     if (this.props.saved) {
-      //return <Redirect to='/admin/categories' />;
       this.props.history.push({
         pathname: `/admin/categories/list-child/${parentId}/${parentName}`,
         state: {
@@ -76,10 +73,6 @@ class CategoryAdd extends React.Component {
       });
     }
 
-    console.log(
-      this.props.categories,
-      '...this.props.categoriescategoriescategories'
-    );
     return (
       <div>
         <Breadcrumb tag='nav' listTag='div'>
