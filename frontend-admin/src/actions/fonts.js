@@ -3,6 +3,14 @@ import { callHttpRequest } from '../helpers/services';
 export const FONT_LIST = 'FONT_LIST';
 export const SAVED_FONTS = 'SAVED_FONTS';
 export const FONTS_ERROR = 'FONTS_ERROR';
+export const EDIT_FONTS = 'EDIT_FONTS';
+
+export function editForm(data) {
+  return {
+    type: EDIT_FONTS,
+    playLoad: data,
+  };
+}
 
 export function loadFonts(data) {
   return {
@@ -34,8 +42,20 @@ export function getFonts(creds) {
 
 export function saveFonts(fromData) {
   return async (dispatch) => {
-    const data = await callHttpRequest('post', 'fonts/save', fromData);
+    const data = await callHttpRequest('post', 'fonts/save', fromData, true);
     console.log(data, '.ppopodata......');
+    if (data.status) {
+      dispatch(savedFonts());
+    } else {
+      dispatch(errorFonts(data.error));
+    }
+  };
+}
+
+export function updateFonts(fromData) {
+  return async (dispatch) => {
+    const data = await callHttpRequest('post', 'fonts/edit', fromData, true);
+    console.log(data, 'edit call.....');
     if (data.status) {
       dispatch(savedFonts());
     } else {

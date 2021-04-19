@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router';
 import { HashRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import IdleTimer from 'react-idle-timer';
 
 /* eslint-disable */
 import ErrorPage from '../pages/error';
@@ -37,14 +38,45 @@ const CloseButton = ({ closeToast }) => (
 );
 
 class App extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.idleTimer = null;
+    //this.handleOnAction = this.handleOnAction.bind(this);
+    //this.handleOnActive = this.handleOnActive.bind(this);
+    this.handleOnIdle = this.handleOnIdle.bind(this);
+  }
+
+  // handleOnAction(event) {
+  //   console.log('user did something', event);
+  // }
+
+  // handleOnActive(event) {
+  //   console.log('user is active', event);
+  //   console.log('time remaining', this.idleTimer.getRemainingTime());
+  // }
+
+  handleOnIdle(event) {
+    console.log('user is idle');
+    this.props.history.push('/login');
+  }
   render() {
     return (
       <div>
-        <ToastContainer
+        <IdleTimer
+          ref={(ref) => {
+            this.idleTimer = ref;
+          }}
+          timeout={1000 * 60 * 15}
+          onActive={this.handleOnActive}
+          onIdle={this.handleOnIdle}
+          onAction={this.handleOnAction}
+          debounce={250}
+        />
+        {/* <ToastContainer
           autoClose={5000}
           hideProgressBar
           closeButton={<CloseButton />}
-        />
+        /> */}
         <HashRouter>
           <Switch>
             <PrivateRoute
@@ -52,11 +84,11 @@ class App extends React.PureComponent {
               dispatch={this.props.dispatch}
               component={LayoutComponent}
             />
-            <Route path='/register' exact component={Register} />
+            {/* <Route path='/register' exact component={Register} /> */}
             <Route path='/login' exact component={Login} />
             <Route path='/error' exact component={ErrorPage} />
-            <Route component={ErrorPage} />
-            <Redirect from='*' to='/admin/dashboard' />
+            {/* <Route component={ErrorPage} />
+            <Redirect from='*' to='/admin/dashboard' /> */}
           </Switch>
         </HashRouter>
       </div>

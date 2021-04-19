@@ -1,7 +1,9 @@
 import { categoriesModel } from '../../models/Categories';
-import { getQueryBody } from '../../utils/helper';
+import { getQueryBody, getHeaderBody } from '../../utils/helper';
 import { cloudImageUploader, fontUploader } from '../../utils/upload';
 import { imageUploadConfig } from '../../../config/constants/index';
+import formidable, { IncomingForm } from 'formidable';
+
 export class Categories {
   constructor() {}
 
@@ -45,47 +47,30 @@ export class Categories {
   }
 
   async save(req) {
-    // const { email, phone } = req.body;
-    // const userData = await categoriesModel
-    //   .findOne({
-    //     $or: [
-    //       {
-    //         email,
-    //       },
-    //       {
-    //         phone,
-    //       },
-    //     ],
-    //   })
-    //   .lean();
-    // if (userData && userData.email) {
-    //   return {
-    //     message: 'User already registered',
-    //   };
-    // }
+    const headBody = getHeaderBody(req);
+    const checkValid = new categoriesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
 
-    const doc = new categoriesModel(req.body);
-    return await doc.save(req.body);
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination
+    );
 
-    // await cloudImageUploader(
-    //   req,
-    //   imageUploadConfig.name,
-    //   imageUploadConfig.files,
-    //   imageUploadConfig.destination
-    // );
-
-    // if (!req.fileUploadError.status) {
-    //   req.body.file = req.fileUploadRes;
-    //   req.body.url = req.fileUploadRes.url;
-    //   const doc = new categoriesModel(req.body);
-    //   return await doc.save(req.body);
-    // } else {
-    //   let newErr = new Error(req.fileUploadError.message);
-    //   newErr.error = {
-    //     fonts: req.fileUploadError.message,
-    //   };
-    //   newErr.error_code = 'FILE_UPLOAD';
-    //   throw newErr;
-    // }
+    if (!req.fileUploadError.status) {
+      req.body.file = req.fileUploadRes;
+      req.body.url = req.fileUploadRes.url;
+      const doc = new categoriesModel(req.body);
+      return await doc.save(req.body);
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
   }
 }

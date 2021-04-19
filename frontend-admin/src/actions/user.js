@@ -46,18 +46,17 @@ export function loginUser(creds) {
   return async (dispatch) => {
     //dispatch(receiveLogin());
 
-    const { data = {}, status = false } = await callHttpRequest(
-      'post',
-      'users/login',
-      creds
-    );
-    //console.log(data, '.hjghjghjg');
-    if (status) {
-      console.log(data, '...userData');
-      localStorage.setItem('token', data.token);
+    const {
+      data: [userData = {}],
+      status = false,
+    } = await callHttpRequest('post', 'users/login', creds);
+    console.log(userData, '.hjghjghjg');
+    if (status && userData.role === 'admin') {
+      console.log(userData, '...userData');
+      localStorage.setItem('token', userData.token);
       localStorage.setItem('authenticated', true);
-      localStorage.setItem('user', JSON.stringify(data));
-      dispatch(receiveLogin(data));
+      localStorage.setItem('user', JSON.stringify(userData));
+      dispatch(receiveLogin(userData));
     } else {
       dispatch(loginError('Please enter valid login details.'));
     }

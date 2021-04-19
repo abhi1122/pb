@@ -22,7 +22,8 @@ class Login extends React.Component {
   //     dispatch: PropTypes.func.isRequired,
   //   };
 
-  static isAuthenticated(token) {
+  static isAuthenticated() {
+    const token = localStorage.getItem('authenticated');
     console.log(token, '......token');
     if (token) return true;
   }
@@ -31,28 +32,19 @@ class Login extends React.Component {
     super(props);
 
     this.state = {
-      email: 'abhinew@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     };
 
     this.doLogin = this.doLogin.bind(this);
     this.changeInput = this.changeInput.bind(this);
-    // this.changeEmail = this.changeEmail.bind(this);
-    // this.changePassword = this.changePassword.bind(this);
-    // this.signUp = this.signUp.bind(this);
   }
 
-  //   changeEmail(event) {
-  //     this.setState({
-  //       email: event.target.value,
-  //     });
-  //   }
-
-  //   changePassword(event) {
-  //     this.setState({
-  //       password: event.target.value,
-  //     });
-  //   }
+  componentDidMount() {
+    localStorage.removeItem('authenticated');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
 
   doLogin(e) {
     e.preventDefault();
@@ -65,7 +57,7 @@ class Login extends React.Component {
   }
 
   changeInput(e) {
-    this.setState({ [e.target.name]: [e.target.value] });
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   //   signUp() {
@@ -76,13 +68,11 @@ class Login extends React.Component {
     console.log(this.props, 'this.state.auth......111111');
     const { from } = this.props.location.state || {
       from: {
-        pathname: '/admin/fonts',
+        pathname: '/admin/dashboard',
       },
     }; // eslint-disable-line
 
-    if (
-      Login.isAuthenticated(JSON.parse(localStorage.getItem('authenticated')))
-    ) {
+    if (Login.isAuthenticated()) {
       return <Redirect to={from} />;
     }
 
@@ -93,29 +83,24 @@ class Login extends React.Component {
             className='widget-auth mx-auto'
             title={<h3 className='mt-0'> Login to your Web App </h3>}
           >
-            {' '}
-            <p className='widget-auth-info'>
-              Use your email to sign in .{' '}
-            </p>{' '}
+            <p className='widget-auth-info'>Use your email to sign in .</p>
             <form onSubmit={this.doLogin}>
-              {' '}
               {this.props.errorMessage && (
                 <Alert
                   className='alert-sm widget-middle-overflow rounded-0'
                   color='danger'
                 >
-                  {' '}
-                  {this.props.errorMessage}{' '}
+                  {this.props.errorMessage}
                 </Alert>
-              )}{' '}
+              )}
               <FormGroup className='mt'>
-                <Label for='email'> Email </Label>{' '}
+                <Label for='email'> Email </Label>
                 <InputGroup className='input-group-no-border'>
                   <InputGroupAddon addonType='prepend'>
                     <InputGroupText>
                       <i className='la la-user text-white' />
-                    </InputGroupText>{' '}
-                  </InputGroupAddon>{' '}
+                    </InputGroupText>
+                  </InputGroupAddon>
                   <Input
                     id='email'
                     className='input-transparent pl-3'
@@ -126,28 +111,28 @@ class Login extends React.Component {
                     name='email'
                     placeholder='Email'
                   />
-                </InputGroup>{' '}
-              </FormGroup>{' '}
+                </InputGroup>
+              </FormGroup>
               <FormGroup>
-                <Label for='password'> Password </Label>{' '}
+                <Label for='password'> Password </Label>
                 <InputGroup className='input-group-no-border'>
                   <InputGroupAddon addonType='prepend'>
                     <InputGroupText>
                       <i className='la la-lock text-white' />
-                    </InputGroupText>{' '}
-                  </InputGroupAddon>{' '}
+                    </InputGroupText>
+                  </InputGroupAddon>
                   <Input
                     id='password'
                     className='input-transparent pl-3'
                     value={this.state.password}
-                    onChange={this.changePassword}
+                    onChange={this.changeInput}
                     type='password'
                     required
                     name='password'
                     placeholder='Password'
                   />
-                </InputGroup>{' '}
-              </FormGroup>{' '}
+                </InputGroup>
+              </FormGroup>
               <div className='bg-widget auth-widget-footer'>
                 <Button
                   type='submit'
@@ -165,14 +150,14 @@ class Login extends React.Component {
                     }}
                   >
                     <i className='la la-caret-right' />
-                  </span>{' '}
-                  {this.props.isFetching ? 'Loading...' : 'Login'}{' '}
-                </Button>{' '}
-              </div>{' '}
-            </form>{' '}
-          </Widget>{' '}
-        </Container>{' '}
-        <footer className='auth-footer'></footer>{' '}
+                  </span>
+                  {this.props.isFetching ? 'Loading...' : 'Login'}
+                </Button>
+              </div>
+            </form>
+          </Widget>
+        </Container>
+        <footer className='auth-footer'></footer>
       </div>
     );
   }

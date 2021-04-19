@@ -31,8 +31,10 @@ class CategoryAdd extends React.Component {
       fnt: {},
       png: {},
       fonts: [],
-      parentName: '',
+      parentName: 'Business',
       parentId: null,
+      status: true,
+      image: '',
     };
   }
 
@@ -56,13 +58,30 @@ class CategoryAdd extends React.Component {
 
   save = (e) => {
     e.preventDefault();
-    this.props.dispatch(
-      saveForm({ name: this.state.name, parentId: this.state.parentId })
-    );
+    // this.props.dispatch(
+    //   saveForm({ name: this.state.name, parentId: this.state.parentId })
+    // );
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', this.state.name);
+    formData.append('status', this.state.status);
+    formData.append('image', this.state.image);
+    this.props.dispatch(saveForm(formData));
+  };
+
+  changeCheck = (e) => {
+    this.setState({ status: e.target.checked });
+  };
+
+  onFileChange = (event) => {
+    console.log(event.target.files, '...event.target.files');
+    this.setState({ image: event.target.files[0] });
   };
 
   render() {
+    console.log(this.props, '.......ADD cAT');
     const { parentId, parentName } = this.state;
+    const pageTitle = parentName !== 'Business' ? 'New Sub Category for' : '';
     if (this.props.saved) {
       this.props.history.push({
         pathname: `/admin/categories/list-child/${parentId}/${parentName}`,
@@ -100,8 +119,8 @@ class CategoryAdd extends React.Component {
           <Col>
             <Widget>
               <SectionHeader
-                headName={`Add New Sub Category for ${this.state.parentName}`}
-                headButtonName='Category List'
+                headName={`Add ${pageTitle} ${parentName}`}
+                headButtonName={`${parentName} List`}
                 headButtonUrl={`/admin/categories/list-child/${parentId}/${this.state.parentName}`}
                 props={this.props}
                 buttonState={{ parentId, parentName }}
@@ -118,7 +137,7 @@ class CategoryAdd extends React.Component {
                   </Alert>
                 )}
                 <FormGroup className='mt'>
-                  <Label for='name'>Category Name</Label>
+                  <Label for='name'>Name</Label>
                   <InputGroup className='input-group-no-border'>
                     <InputGroupAddon addonType='prepend'>
                       <InputGroupText>
@@ -132,10 +151,39 @@ class CategoryAdd extends React.Component {
                       onChange={this.changeInput}
                       type='text'
                       name='name'
-                      placeholder='Category Name'
+                      placeholder='Name'
                     />
                   </InputGroup>
                   <InputValidationError error={this.props.errors.name} />
+                </FormGroup>
+
+                <FormGroup className='mt'>
+                  <Label for='name'>Select Image</Label>
+                  <InputGroup className='input-group-no-border'>
+                    <Input
+                      id='name'
+                      className='input-transparent pl-3'
+                      type='file'
+                      name='name'
+                      placeholder='Name'
+                      onChange={this.onFileChange}
+                    />
+                  </InputGroup>
+                  <InputValidationError error={this.props.errors.image} />
+                </FormGroup>
+
+                <FormGroup className='mt'>
+                  <div className='abc-checkbox'>
+                    <Input
+                      id='status'
+                      type='checkbox'
+                      checked={this.state.status}
+                      onChange={(event) => this.changeCheck(event)}
+                    />
+
+                    <Label for='status' />
+                    <spam>Do you want to activate this</spam>
+                  </div>
                 </FormGroup>
 
                 <br />
@@ -165,6 +213,7 @@ function mapStateToProps(state) {
     saved: state.categories.saved,
     errors: state.categories.errors,
     categories: state.categories,
+    core: state.core,
   };
 }
 

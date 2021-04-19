@@ -50,8 +50,14 @@ export const errorResponseHandler = (resp, msgKey) => {
 
 export const createError = (error, req = {}, res = {}) => {
   logger.error(`createError called ${JSON.stringify(error)}`);
+  const parseError = JSON.parse(JSON.stringify(error));
+  console.log(parseError, '.....parseError');
   let message = error.message ? error.message : __('Something went wrong');
-  if (error instanceof mongoose.Error.ValidationError) {
+  if (
+    error instanceof mongoose.Error.ValidationError ||
+    parseError.name === 'MongoError'
+  ) {
+    console.log('enter mongo errro.....');
     error = parseMongoError(error, req);
     res.status(400);
   } else if (error.error_code && error.error_code === 'FILE_UPLOAD') {
@@ -88,6 +94,10 @@ export const parseMongoError = (
   for (const errorKey in errorObj.errors) {
     errorParseObj[errorKey] = __(errorObj.errors[errorKey].message);
   }
+  if (errorObj.code === 11000) {
+    const [key = '__'] = Object.keys(errorObj.keyValue);
+    errorParseObj[key] = `${key} already exist!`;
+  }
   return errorParseObj;
 };
 
@@ -99,4 +109,16 @@ export const getQueryBody = (req) => {
   limit = parseInt(limit);
 
   return { searchQuery, sort, skip, limit };
+};
+
+export const getHeaderBody = (req) => {
+  console.log('req.headers.filterbody...', req.headers.filterbody);
+  if (!req.headers.filterbody) {
+    return {};
+  }
+
+  if (typeof req.headers.filterbody === 'string') {
+    return JSON.parse(req.headers.filterbody);
+  }
+  return req.headers.filterbody;
 };

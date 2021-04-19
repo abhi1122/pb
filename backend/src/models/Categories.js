@@ -27,7 +27,7 @@ const categories = new Schema({
     type: String,
     required: false,
   },
-  idDeleted: {
+  status: {
     type: Boolean,
     default: false,
   },

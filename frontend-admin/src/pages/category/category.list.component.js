@@ -1,28 +1,12 @@
 import React from 'react';
-import {
-  Row,
-  Col,
-  Table,
-  Progress,
-  Button,
-  UncontrolledButtonDropdown,
-  DropdownMenu,
-  DropdownToggle,
-  DropdownItem,
-  Input,
-  Label,
-  Breadcrumb,
-  BreadcrumbItem,
-  Badge,
-} from 'reactstrap';
+import { Row, Col, Table, Breadcrumb, BreadcrumbItem, Badge } from 'reactstrap';
 import { getList } from '../../actions/category';
 import { connect } from 'react-redux';
-import { withRouter, Redirect, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import Widget from '../../components/Widget/Widget';
 import { SectionHeader } from '../../helpers/components/common-ui';
 import { CloudImage } from '../../helpers/components/CloudImage';
-
-// import './index.module.scss';
+import { StatusBadge, FormatDate } from '../../helpers/components/common-ui';
 
 class CategoryList extends React.Component {
   constructor(props) {
@@ -106,6 +90,7 @@ class CategoryList extends React.Component {
 
   render() {
     const { parentId, parentName, parentSlugName } = this.state;
+    const pageName = this.state.parentName ? this.state.parentName : 'Business';
     return (
       <div>
         <Breadcrumb tag='nav' listTag='div'>
@@ -133,10 +118,8 @@ class CategoryList extends React.Component {
           <Col>
             <Widget>
               <SectionHeader
-                headName={`${
-                  this.state.parentName ? this.state.parentName : 'Business'
-                } List`}
-                headButtonName='+ Add Category'
+                headName={`${pageName} List`}
+                headButtonName={`+ Add ${pageName}`}
                 headButtonUrl={`/admin/categories/add-child/${parentId}/${parentSlugName}`}
                 props={this.props}
                 buttonState={{ parentId, parentName }}
@@ -167,27 +150,12 @@ class CategoryList extends React.Component {
                       </td>
                       <td>{row.name}</td>
                       <td>
-                        {row.createdAt}
-                        {row.UpdatedAt}
+                        <FormatDate date={row.createdAt} />
                       </td>
-                      <td>{row.idDeleted}</td>
                       <td>
-                        {/* <a href='javascript:void(0)'>
-                          <Badge
-                            color='success'
-                            onClick={() =>
-                              this.props.history.push({
-                                pathname: `/admin/categories/add-child/${row._id}`,
-                                state: {
-                                  parentId: row._id,
-                                  parentName: row.name,
-                                },
-                              })
-                            }
-                          >
-                            + Add Category
-                          </Badge>
-                        </a> */}
+                        <StatusBadge status={row.status} />
+                      </td>
+                      <td>
                         <a href='javascript:void(0)'>
                           <Badge
                             color='success'

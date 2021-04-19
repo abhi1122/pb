@@ -1,7 +1,9 @@
 import { templatesModel } from '../../models/Templates';
 import { fontsModel } from '../../models/Fonts';
-import { getQueryBody } from '../../utils/helper';
+import { getQueryBody, getHeaderBody } from '../../utils/helper';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import { cloudImageUploader, fontUploader } from '../../utils/upload';
+import { imageUploadConfig } from '../../../config/constants/index';
 import Jimp from 'jimp';
 
 export class Templates {
@@ -13,12 +15,38 @@ export class Templates {
   }
 
   async save(req) {
-    const templatesData = req.body;
-    templatesData.logo = JSON.parse(req.body.logo);
-    templatesData.texts = JSON.parse(req.body.texts);
-    templatesData.url = req.body.url;
-    const doc = new templatesModel(templatesData);
-    return await doc.save(templatesData);
+    const headBody = getHeaderBody(req);
+    const checkValid = new templatesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination
+    );
+
+    if (!req.fileUploadError.status) {
+      req.body.file = req.fileUploadRes;
+      req.body.url = req.fileUploadRes.url;
+      const doc = new templatesModel(req.body);
+      return await doc.save(req.body);
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
+
+    // const templatesData = req.body;
+    // templatesData.logo = JSON.parse(req.body.logo);
+    // templatesData.texts = JSON.parse(req.body.texts);
+    // templatesData.url = req.body.url;
+    // const doc = new templatesModel(templatesData);
+    // return await doc.save(templatesData);
   }
 
   async update(req) {
@@ -69,8 +97,12 @@ export class Templates {
           const loadFont = await Jimp.loadFont(selectedFont.path);
           image
             .print(loadFont, Number(text.x), Number(text.y), text.text)
-            .write(`public/img-load/test2.jpeg`);
+            .write(`public/img-load/demo-template.jpeg`);
         });
+        resolve({ url: `public/img-load/demo-template.jpeg` });
+        // return new Promise((resolve) =>
+        //   resolve({ url: `public/img-load/demo-template.jpeg` })
+        // );
 
         // Jimp.loadFont('public/Montserrat-Regular.ttf.fnt')
         //   .then((font) => {
@@ -90,5 +122,11 @@ export class Templates {
       .catch((err) => {
         console.error(err);
       });
+
+    return new Promise((resolve) =>
+      resolve({
+        url: `${req.protocol}://${req.get('host')}/img-load/demo-template.jpeg`,
+      })
+    );
   }
 }

@@ -1,22 +1,10 @@
-import multer, {
-  diskStorage,
-  MulterError
-} from 'multer';
+import multer, { diskStorage, MulterError } from 'multer';
 import * as path from 'path';
-import {
-  read
-} from 'jimp';
-import {
-  fontUploadConfig,
-  imageUploadConfig
-} from '../../config/constants';
-import {
-  errorResponseHandler
-} from '../utils/helper';
+import { read } from 'jimp';
+import { fontUploadConfig, imageUploadConfig } from '../../config/constants';
+import { errorResponseHandler } from '../utils/helper';
 
-import {
-  cloudUpload
-} from './cloudinary';
+import { cloudUpload } from './cloudinary';
 var fs = require('fs');
 
 const fileUploadConfig = (
@@ -63,19 +51,23 @@ const fileUploadConfig = (
     storage: storage,
     limits: {
       fileSize: fontUploadConfig.fileSize,
-      files: allowFiles
+      files: allowFiles,
     },
   }).array(name, allowFiles);
 
   return upload;
 };
 
-export const fontUploader = (req, keyName, allowImage) => {
+export const fontUploader = (
+  req,
+  keyName,
+  allowImage,
+  skipRequired = false
+) => {
   console.log(keyName, allowImage);
   return new Promise(function (resolve, reject) {
     var upload = fileUploadConfig(keyName, allowImage);
     upload(req, {}, function (error) {
-      console.log(error, 'upload font error........');
       if (error || error instanceof MulterError) {
         req.fileUploadError = {
           status: true,
@@ -83,13 +75,21 @@ export const fontUploader = (req, keyName, allowImage) => {
         };
         resolve(error);
       } else {
-        req.fileUploadError = false;
-        resolve();
+        const [fonts = null] = req.files;
+        if (!fonts && !skipRequired) {
+          req.fileUploadError = {
+            status: true,
+            message: 'Please select file',
+          };
+          resolve(error);
+        } else {
+          req.fileUploadError = false;
+          resolve();
+        }
       }
     });
   });
 };
-
 
 const cloudImageUploadConfig = (
   name = imageUploadConfig.name,
@@ -106,7 +106,7 @@ const cloudImageUploadConfig = (
   });
 
   var fileFilter = function (req, file, cb) {
-    if (fontUploadConfig.extensions.indexOf(file.mimetype) === -1) {
+    if (imageUploadConfig.extensions.indexOf(file.mimetype) === -1) {
       return cb(new Error('Invalid file type'));
     }
     cb(null, true);
@@ -117,13 +117,12 @@ const cloudImageUploadConfig = (
     storage: storage,
     limits: {
       fileSize: imageUploadConfig.fileSize,
-      files: allowFiles
+      files: allowFiles,
     },
   }).array(name, allowFiles);
 
   return upload;
 };
-
 
 export const cloudImageUploader = (req, keyName, allowImage, folder) => {
   return new Promise(function (resolve, reject) {
@@ -136,13 +135,20 @@ export const cloudImageUploader = (req, keyName, allowImage, folder) => {
         };
         resolve(error);
       } else {
-        const [localFile = {}] = req.files;
-        const cloudRes = await cloudUpload(localFile.path, folder);
-        console.log(cloudRes, '.......cloudRes');
-        fs.unlinkSync(localFile.path);
-        req.fileUploadError = false;
-        req.fileUploadRes = cloudRes;
-        resolve();
+        const [localFile = null] = req.files;
+        if (localFile) {
+          const cloudRes = await cloudUpload(localFile.path, folder);
+          fs.unlinkSync(localFile.path);
+          req.fileUploadError = false;
+          req.fileUploadRes = cloudRes;
+          resolve();
+        } else {
+          req.fileUploadError = {
+            status: true,
+            message: 'Please select file',
+          };
+          resolve(error);
+        }
       }
     });
   });

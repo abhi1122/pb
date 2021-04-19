@@ -16,6 +16,7 @@ export default function auth(
         ...state,
         user: !state.user ? action.payload : state.user,
         callTime: new Date().getTime(),
+        isAuthenticated: true,
       };
     case LOGIN_FAILURE:
       return Object.assign({}, state, {
