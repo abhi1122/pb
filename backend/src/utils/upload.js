@@ -124,7 +124,13 @@ const cloudImageUploadConfig = (
   return upload;
 };
 
-export const cloudImageUploader = (req, keyName, allowImage, folder) => {
+export const cloudImageUploader = (
+  req,
+  keyName,
+  allowImage,
+  folder,
+  skipRequired = false
+) => {
   return new Promise(function (resolve, reject) {
     var upload = cloudImageUploadConfig(keyName, allowImage);
     upload(req, {}, async function (error) {
@@ -143,11 +149,15 @@ export const cloudImageUploader = (req, keyName, allowImage, folder) => {
           req.fileUploadRes = cloudRes;
           resolve();
         } else {
-          req.fileUploadError = {
-            status: true,
-            message: 'Please select file',
-          };
-          resolve(error);
+          if (skipRequired === false) {
+            req.fileUploadError = {
+              status: true,
+              message: 'Please select file',
+            };
+            resolve(error);
+          } else {
+            resolve();
+          }
         }
       }
     });

@@ -52,12 +52,12 @@ export const FormatDate = ({ date }) => {
 export const ShowDates = ({ createdAt, updatedAt }) => {
   return (
     <span>
-      <Badge color='success' pill>
+      <Badge color='dark'>
         <FormatDate date={createdAt} />
       </Badge>
       <br />
       <br />
-      <Badge color='primary' pill>
+      <Badge color='light'>
         <FormatDate date={updatedAt} />
       </Badge>
     </span>

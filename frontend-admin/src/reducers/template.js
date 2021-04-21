@@ -6,6 +6,7 @@ import {
   FORM_CHANGE,
   DOWNLOAD_URL,
   SAVED_AXIS,
+  LOAD_EDIT,
 } from '../actions/template';
 
 const defaultState = {
@@ -13,7 +14,7 @@ const defaultState = {
   saved: false,
   errors: {},
   axis: [],
-  formData: {},
+  formData: { status: true },
   downloadUrl: '',
   setAxis: false,
 };
@@ -27,6 +28,19 @@ export default function template(state = defaultState, action = {}) {
         saved: false,
         downloadUrl: '',
         setAxis: false,
+        formData: defaultState.formData,
+      };
+    case LOAD_EDIT:
+      return {
+        ...state,
+        list: [],
+        errors: {},
+        saved: false,
+        downloadUrl: '',
+        setAxis: false,
+        formData: action.playLoad.length
+          ? action.playLoad[0]
+          : defaultState.formData,
       };
     case SAVED_FORM:
       return { ...state, saved: true, downloadUrl: '', setAxis: false };

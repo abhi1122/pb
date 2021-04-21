@@ -41,6 +41,15 @@ router.post('/save', async (req, res, next) => {
   }
 });
 
+router.post('/edit', async (req, res, next) => {
+  try {
+    const response = await modalObj.edit(req);
+    res.send(createResponse(response, req, res));
+  } catch (error) {
+    res.send(createError(error, res, res));
+  }
+});
+
 /**
  * @swagger
  * /categories/list:

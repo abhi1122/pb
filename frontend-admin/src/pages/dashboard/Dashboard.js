@@ -1,5 +1,16 @@
 import React from 'react';
-import { Row, Col, Progress, Table, Label, Input } from 'reactstrap';
+import {
+  Row,
+  Col,
+  Progress,
+  Table,
+  Label,
+  Input,
+  Card,
+  CardBody,
+  Button,
+} from 'reactstrap';
+import { Icon } from '@material-ui/core';
 
 import Widget from '../../components/Widget';
 
@@ -54,7 +65,128 @@ class Dashboard extends React.Component {
   }
 
   render() {
-    return <div>My Dashboard</div>;
+    const blocks = [
+      {
+        icon: 'thumbs-o-up',
+        color: '#2477ff',
+        name: 'Total Users',
+        number: '10,000',
+      },
+      {
+        icon: 'magic',
+        color: '#db2a34',
+        name: 'Total Category',
+        number: '200',
+      },
+      { icon: 'user-o', color: 'grey', name: 'Total Template', number: '500' },
+      {
+        icon: 'film',
+        color: '#2d8515',
+        name: 'Total Downloads',
+        number: '8,000',
+      },
+      {
+        icon: 'thumbs-o-up',
+        color: '#2477ff',
+        name: 'Total Users',
+        number: '10,000',
+      },
+      {
+        icon: 'magic',
+        color: '#db2a34',
+        name: 'Total Category',
+        number: '200',
+      },
+      { icon: 'user-o', color: 'grey', name: 'Total Template', number: '500' },
+      {
+        icon: 'film',
+        color: '#2d8515',
+        name: 'Total Downloads',
+        number: '8,000',
+      },
+      {
+        icon: 'film',
+        color: '#2d8515',
+        name: 'Total Downloads',
+        number: '8,000',
+      },
+      {
+        icon: 'thumbs-o-up',
+        color: '#2477ff',
+        name: 'Total Users',
+        number: '10,000',
+      },
+      {
+        icon: 'magic',
+        color: '#db2a34',
+        name: 'Total Category',
+        number: '200',
+      },
+      { icon: 'user-o', color: 'grey', name: 'Total Template', number: '500' },
+      {
+        icon: 'film',
+        color: '#2d8515',
+        name: 'Total Downloads',
+        number: '8,000',
+      },
+    ];
+    return (
+      <div>
+        {blocks.map((val, index) => (
+          <Card
+            className='border-0'
+            style={{
+              width: '20%',
+              display: 'inline-block',
+              marginRight: '30px',
+              marginLeft: '20px',
+              height: '130px',
+              marginTop: '50px',
+            }}
+          >
+            <CardBody style={{ display: 'flex' }}>
+              {/* <div
+                  style={{
+                    width: '30%',
+                    display: 'inline-block',
+                    marginLeft: '10px',
+                    // backgroundColor: 'red',
+                    height: '60px',
+                  }}
+                > */}
+
+              <Icon
+                className={`fa fa-${val.icon}`}
+                style={{
+                  opacity: '.8',
+                  fontSize: '46px',
+                  height: '70px',
+                  width: '80px',
+                  color: val.color,
+                  lineHeight: '50px',
+                  //display: 'inline-block',
+                }}
+              />
+
+              <div>
+                <h5>{val.name}</h5>
+                <h3>{val.number}</h3>
+              </div>
+              {/* </div> */}
+              {/* <div
+                  style={{
+                    width: '50%',
+                    display: 'inline-block',
+                    marginLeft: '10px',
+                    //  backgroundColor: 'white',
+                    height: '60px',
+                  }}
+                ></div> */}
+            </CardBody>
+          </Card>
+        ))}
+      </div>
+    );
   }
 }
 

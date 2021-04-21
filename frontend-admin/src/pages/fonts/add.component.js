@@ -37,7 +37,7 @@ class FontsAdd extends React.Component {
   componentDidMount() {
     if (this.props && this.props.match.params.id) {
       this.props.dispatch(
-        getFonts({ searchQuery: { _id: this.props.match.params.id } })
+        getFonts({ searchQuery: { _id: this.props.match.params.id } }, true)
       );
     }
   }
@@ -83,18 +83,17 @@ class FontsAdd extends React.Component {
   };
 
   render() {
-    console.log(this.props, '././././././');
+    const labelSlug = !this.props.formData._id ? 'Create' : 'Edit';
     if (this.props.saved) {
       return <Redirect to='/admin/fonts' />;
     }
-    console.log(this.props.fonts, '...this.props.fonts');
     return (
       <div>
         <Row>
           <Col>
             <Widget>
               <SectionHeader
-                headName='Add New Font'
+                headName={`${labelSlug} Font`}
                 headButtonName='Font List'
                 headButtonUrl='/admin/fonts'
                 props={this.props}
@@ -193,12 +192,34 @@ class FontsAdd extends React.Component {
 
                 <div className='bg-widget-transparent auth-widget-footer'>
                   <Button
-                    type='submit'
+                    onClick={() =>
+                      this.props.history.push({
+                        pathname: '/admin/fonts',
+                        state: {},
+                      })
+                    }
                     color='danger'
                     className='auth-btn'
-                    style={{ color: '#fff' }}
+                    //size='lg'
+                    style={{
+                      color: '#fff',
+                      float: 'right',
+                      marginLeft: '20px',
+                    }}
                   >
-                    {this.props.isFetching ? 'Loading...' : 'Create'}
+                    {this.props.isFetching ? 'Loading...' : 'CANCEL'}
+                  </Button>
+                  <Button
+                    type='submit'
+                    color='success'
+                    className='auth-btn'
+                    //size='lg'
+                    style={{
+                      color: '#fff',
+                      float: 'right',
+                    }}
+                  >
+                    {this.props.isFetching ? 'Loading...' : 'SAVE'}
                   </Button>
                 </div>
               </form>

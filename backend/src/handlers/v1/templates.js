@@ -14,6 +14,43 @@ export class Templates {
     return await templatesModel.find(searchQuery, [], { sort, skip, limit });
   }
 
+  async edit(req) {
+    const headBody = getHeaderBody(req);
+    const checkValid = new templatesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+    const skipImage = true;
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination,
+      skipImage
+    );
+
+    if (skipImage || !req.fileUploadError.status) {
+      if (req.fileUploadRes && req.fileUploadRes.url) {
+        req.body.file = req.fileUploadRes;
+        req.body.url = req.fileUploadRes.url;
+      }
+
+      const { id } = req.body;
+      delete req.body.id;
+      console.log(req.body, '.........req.body');
+      return await templatesModel.updateMany(
+        { _id: id },
+        { $set: { ...req.body } }
+      );
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
+  }
+
   async save(req) {
     const headBody = getHeaderBody(req);
     const checkValid = new templatesModel(headBody);
@@ -82,8 +119,9 @@ export class Templates {
   async demoDownload(req) {
     const templateData = await templatesModel.findOne({ _id: req.params.id });
     //fontsModel.findOne({ _id: templateData.id })
+    // image.composite( src, x, y, [{ mode, opacitySource, opacityDest }] );
     console.log(templateData, '...templatesData');
-    const { texts, url } = templateData;
+    const { texts, url, logo = [] } = templateData;
     await Jimp.read(url)
       .then((image) => {
         texts.map(async (text) => {
@@ -99,6 +137,11 @@ export class Templates {
             .print(loadFont, Number(text.x), Number(text.y), text.text)
             .write(`public/img-load/demo-template.jpeg`);
         });
+
+        // Promise.all([promise1, promise2, promise3]).then((values) => {
+        //   console.log(values);
+        // });
+
         resolve({ url: `public/img-load/demo-template.jpeg` });
         // return new Promise((resolve) =>
         //   resolve({ url: `public/img-load/demo-template.jpeg` })

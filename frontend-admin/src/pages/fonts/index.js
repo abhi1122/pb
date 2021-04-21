@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Table, Badge } from 'reactstrap';
+import { Row, Col, Table, Badge, Input } from 'reactstrap';
 import { getFonts } from '../../actions/fonts';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -11,11 +11,11 @@ import { StatusBadge, ShowDates } from '../../helpers/components/common-ui';
 class Fonts extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { search: {} };
   }
 
   componentDidMount() {
-    this.props.dispatch(getFonts());
+    this.props.dispatch(getFonts({ sort: { _id: -1 } }));
   }
 
   checkAll(ev, checkbox) {
@@ -37,6 +37,22 @@ class Fonts extends React.Component {
     });
   };
 
+  search = (e) => {
+    console.log('call,,,', e.target.value.length);
+    if (e.target.value.length > 3) {
+      this.setState(
+        {
+          search: { ...this.state.search, [e.target.name]: e.target.value },
+        },
+        () =>
+          this.props.dispatch(
+            getFonts({ sort: { _id: -1 }, searchQuery: this.state.search })
+          )
+      );
+      //this.props.dispatch(getFonts({ sort: { _id: -1 } }));
+    }
+  };
+
   render() {
     return (
       <div>
@@ -52,11 +68,50 @@ class Fonts extends React.Component {
               <Table striped>
                 <thead>
                   <tr className='fs-sm'>
-                    <th className='hidden-sm-down'>#</th>
+                    <th className='hidden-sm-down'># Id</th>
                     <th>Name</th>
                     <th>Add/Update Date</th>
                     <th>Status</th>
                     <th>Actions</th>
+                  </tr>
+                </thead>
+                <thead>
+                  <tr className='fs-sm'>
+                    <th>
+                      <Input
+                        id='_id'
+                        className='input-transparent pl-3'
+                        value={this.state.search.id}
+                        onChange={this.search}
+                        type='text'
+                        name='_id'
+                        placeholder='Search by Id'
+                      />
+                    </th>
+                    <th>
+                      <Input
+                        id='name'
+                        className='input-transparent pl-3'
+                        value={this.state.search.name}
+                        onChange={this.search}
+                        type='text'
+                        name='name'
+                        placeholder='Search by Name'
+                      />
+                    </th>
+                    <th></th>
+                    <th>
+                      <Input
+                        id='name'
+                        className='input-transparent pl-3'
+                        //value={this.props.formData.name}
+                        //onChange={this.changeName}
+                        type='text'
+                        name='name'
+                        placeholder='Search by Status'
+                      />
+                    </th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>

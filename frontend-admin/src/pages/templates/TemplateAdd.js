@@ -35,7 +35,7 @@ import {
 } from '../../actions/template';
 
 import { getList as getCategoryList } from '../../actions/category';
-import { saveForm } from '../../actions/template';
+import { saveForm, updateForm } from '../../actions/template';
 
 import { getFonts } from '../../actions/fonts';
 
@@ -43,39 +43,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import AutocompleteUi from '../../helpers/components/AutoComplete';
 import { Icon } from '@material-ui/core';
-import Draggable, { DraggableCore } from 'react-draggable'; // Both at the same time
-
-//const inputRef = useRef();
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& .MuiInputLabel-outlined:not(.MuiInputLabel-shrink)': {
-      // Default transform is "translate(14px, 20px) scale(1)""
-      // This lines up the label with the initial cursor position in the input
-      // after changing its padding-left.
-      transform: 'translate(34px, 20px) scale(1);',
-    },
-  },
-  inputRoot: {
-    color: 'purple',
-    // This matches the specificity of the default styles at https://github.com/mui-org/material-ui/blob/v4.11.3/packages/material-ui-lab/src/Autocomplete/Autocomplete.js#L90
-    '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child': {
-      // Default left padding is 6px
-      paddingLeft: 26,
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'green',
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'red',
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'purple',
-    },
-  },
-}));
-
-// import './index.module.scss';
+import Draggable from 'react-draggable';
 
 class TemplateAdd extends React.Component {
   constructor(props) {
@@ -97,7 +65,9 @@ class TemplateAdd extends React.Component {
     this.props.dispatch(getCategoryList());
     this.props.dispatch(getFonts());
     if (this.props && this.props.match.params.id) {
-      this.props.dispatch(getCategoryList());
+      this.props.dispatch(
+        getList({ searchQuery: { _id: this.props.match.params.id } }, true)
+      );
     }
     console.log(this.props.location.state, '....this.props.location.state');
     if (this.props.location.state && this.props.location.state.url) {
@@ -125,7 +95,7 @@ class TemplateAdd extends React.Component {
     formData.append('category_id', category_id);
     formData.append('image', image);
     if (_id) {
-      //this.props.dispatch(updateFonts(formData));
+      this.props.dispatch(updateForm(formData));
     } else {
       this.props.dispatch(saveForm(formData));
     }
@@ -210,6 +180,11 @@ class TemplateAdd extends React.Component {
     this.props.dispatch(formChange({ image: event.target.files[0] }));
     //this.setState({ fonts: [...this.state.fonts, event.target.files[0]] });
   };
+
+  getFontObjById = (id) => {
+    console.log(id, '.......getFontObjById', this.props.categoryList);
+    return this.props.categoryList.find((val) => val._id === id);
+  };
   render() {
     const { axis = [], downloadUrl = false, setAxisSaved = false } = this.props;
     console.log(this.props, 'Template parent is calling..........');
@@ -237,6 +212,7 @@ class TemplateAdd extends React.Component {
                 data={this.props.categoryList}
                 labelKey='name'
                 callBack={(selected) => this.setCategory(selected)}
+                selected={this.getFontObjById(this.props.formData.category_id)}
               />
               <form onSubmit={this.save} enctype='multipart/form-data'>
                 {this.props.errorMessage && (
@@ -314,7 +290,9 @@ class TemplateAdd extends React.Component {
                 </div>
               </form>
               <Modal size='lg' isOpen={this.state.addPopup}>
-                <ModalHeader toggle={true}>
+                <ModalHeader
+                  toggle={() => this.props.history.push('/admin/template')}
+                >
                   {setAxisSaved ? (
                     <span>
                       Setting Your Template...
@@ -394,24 +372,42 @@ class TemplateAdd extends React.Component {
                   </div>
                 </ModalBody>
                 <ModalFooter>
-                  <Button
-                    color='secondary'
-                    onClick={() => this.props.history.push('/admin/template')}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    color='primary'
-                    onClick={() => this.downloadTemplate()}
-                  >
-                    Download Template
-                  </Button>
-                  <Button
-                    color='primary'
-                    onClick={() => this.updateTemplate(axis)}
-                  >
-                    Save changes
-                  </Button>
+                  {setAxisSaved ? (
+                    <span>
+                      Setting Your Template...
+                      <Icon
+                        className='fa fa-spinner fa-spin'
+                        style={{
+                          color: 'white',
+                        }}
+                      />
+                    </span>
+                  ) : (
+                    <span>
+                      <Button
+                        color='danger'
+                        onClick={() =>
+                          this.props.history.push('/admin/template')
+                        }
+                      >
+                        Close
+                      </Button>
+                      {'  '}
+                      <Button
+                        color='primary'
+                        onClick={() => this.downloadTemplate()}
+                      >
+                        Download Template
+                      </Button>
+                      {'  '}
+                      <Button
+                        color='primary'
+                        onClick={() => this.updateTemplate(axis)}
+                      >
+                        Save changes
+                      </Button>
+                    </span>
+                  )}
                 </ModalFooter>
               </Modal>
             </Widget>

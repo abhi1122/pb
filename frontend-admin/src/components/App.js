@@ -54,11 +54,17 @@ class App extends React.PureComponent {
   //   console.log('user is active', event);
   //   console.log('time remaining', this.idleTimer.getRemainingTime());
   // }
-
-  handleOnIdle(event) {
+  handleOnIdle = (event) => {
     console.log('user is idle');
-    this.props.history.push('/login');
-  }
+    //this.props.history.push('/login');
+    localStorage.removeItem('authenticated');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/#/login';
+    }
+  };
+
   render() {
     return (
       <div>
@@ -67,9 +73,7 @@ class App extends React.PureComponent {
             this.idleTimer = ref;
           }}
           timeout={1000 * 60 * 15}
-          onActive={this.handleOnActive}
           onIdle={this.handleOnIdle}
-          onAction={this.handleOnAction}
           debounce={250}
         />
         {/* <ToastContainer

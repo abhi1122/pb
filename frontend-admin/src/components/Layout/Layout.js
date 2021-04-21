@@ -139,6 +139,10 @@ class Layout extends React.Component {
                       path='/admin/categories/list-child/:id/:name'
                       component={CategoryList}
                     />
+                    <Route
+                      path='/admin/categories/edit-child/:id/:edit_id'
+                      component={CategoryAdd}
+                    />
 
                     <Route
                       path='/admin/template/add'
@@ -149,6 +153,10 @@ class Layout extends React.Component {
                       path='/admin/template'
                       exact
                       component={TemplateList}
+                    />
+                    <Route
+                      path='/admin/template/edit/:id'
+                      component={TemplateAdd}
                     />
                   </Switch>
                 </CSSTransition>

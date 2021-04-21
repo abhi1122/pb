@@ -1,6 +1,7 @@
 import { callHttpRequest } from '../helpers/services';
 
 export const LOAD_LIST = 'TEMPLATE_LOAD_LIST';
+export const LOAD_EDIT = 'TEMPLATE_LOAD_EDIT';
 export const SAVED_FORM = 'SAVED_FORM';
 export const SAVE_ERROR = 'SAVE_ERROR';
 export const SET_AXIS = 'SET_AXIS';
@@ -15,9 +16,10 @@ export function formChange(data) {
   };
 }
 
-export function loadList(data) {
+export function loadList(data, isEdit = false) {
+  const type = isEdit ? LOAD_EDIT : LOAD_LIST;
   return {
-    type: LOAD_LIST,
+    type: type,
     playLoad: data,
   };
 }
@@ -43,11 +45,11 @@ function loadError(errors) {
   };
 }
 
-export function getList(query) {
+export function getList(query, isEdit = false) {
   return async (dispatch) => {
     const { data } = await callHttpRequest('post', 'templates/list', query);
     console.log(data, '.ppopodata.....poop.');
-    dispatch(loadList(data));
+    dispatch(loadList(data, isEdit));
   };
 }
 
@@ -131,6 +133,23 @@ export function saveForm(fromData) {
       true
     );
     console.log(data, '.ppopodata......');
+    if (data.status) {
+      dispatch(savedForm());
+    } else {
+      dispatch(loadError(data.error));
+    }
+  };
+}
+
+export function updateForm(fromData) {
+  return async (dispatch) => {
+    const data = await callHttpRequest(
+      'post',
+      'templates/edit',
+      fromData,
+      true
+    );
+    console.log(data, 'edit call.....');
     if (data.status) {
       dispatch(savedForm());
     } else {

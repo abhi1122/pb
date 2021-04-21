@@ -7,6 +7,43 @@ import formidable, { IncomingForm } from 'formidable';
 export class Categories {
   constructor() {}
 
+  async edit(req) {
+    const headBody = getHeaderBody(req);
+    const checkValid = new categoriesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+    const skipImage = true;
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination,
+      skipImage
+    );
+
+    if (skipImage || !req.fileUploadError.status) {
+      if (req.fileUploadRes && req.fileUploadRes.url) {
+        req.body.file = req.fileUploadRes;
+        req.body.url = req.fileUploadRes.url;
+      }
+
+      const { id } = req.body;
+      delete req.body.id;
+      console.log(req.body, '.........req.body');
+      return await categoriesModel.updateMany(
+        { _id: id },
+        { $set: { ...req.body } }
+      );
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
+  }
+
   async getByQuery(req) {
     console.log(req.body, '.........body');
     const { searchQuery, sort, skip, limit } = getQueryBody(req);

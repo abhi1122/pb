@@ -20,6 +20,7 @@ import Widget from '../../components/Widget/Widget';
 import { SectionHeader } from '../../helpers/components/common-ui';
 import { Icon } from '@material-ui/core';
 import { CloudImage } from '../../helpers/components/CloudImage';
+import { StatusBadge, ShowDates } from '../../helpers/components/common-ui';
 
 // import './index.module.scss';
 
@@ -66,6 +67,16 @@ class TemplateList extends React.Component {
     });
   }
 
+  goEdit = (id) => {
+    console.log(id, '...');
+    this.props.history.push({
+      pathname: `/admin/template/edit/${id}`,
+      state: {
+        id,
+      },
+    });
+  };
+
   render() {
     console.log(this.props, '.......this.props./././.');
     const { list = [] } = this.props;
@@ -88,6 +99,7 @@ class TemplateList extends React.Component {
                     <th> Image </th>
                     <th> Name </th>
                     <th> Category </th>
+                    <th> Date </th>
                     <th> Status </th>
                     <th> Actions </th>
                   </tr>
@@ -108,13 +120,33 @@ class TemplateList extends React.Component {
                         </td>
                         <td> {row.name} </td>
                         <td> {row['category_id']} </td>
-                        <td> {row.idDeleted} </td>
                         <td>
-                          <Icon
-                            className='fa fa-eye'
-                            style={{
-                              color: 'white',
-                            }}
+                          <ShowDates
+                            createdAt={row.createdAt}
+                            updatedAt={row.updatedAt}
+                          />
+                        </td>
+                        <td>
+                          <StatusBadge status={row.status} />
+                        </td>
+                        <td>
+                          <a
+                            href='javascript:void(0);'
+                            onClick={() => this.goEdit(row._id)}
+                          >
+                            <Badge color='success' className='mr-xs'>
+                              <Icon
+                                className='fa fa-pencil'
+                                style={{
+                                  color: 'white',
+                                  fontSize: '14px',
+                                }}
+                              />{' '}
+                              Edit
+                            </Badge>
+                          </a>
+                          <a
+                            href='javascript:void(0);'
                             onClick={() =>
                               this.props.history.push({
                                 pathname: '/admin/template/add',
@@ -124,7 +156,18 @@ class TemplateList extends React.Component {
                                 },
                               })
                             }
-                          />
+                          >
+                            <Badge color='primary' className='mr-xs'>
+                              <Icon
+                                className='fa fa-arrows-alt'
+                                style={{
+                                  color: 'white',
+                                  fontSize: '14px',
+                                }}
+                              />
+                              <span>Manage Template</span>
+                            </Badge>
+                          </a>
                         </td>
                       </tr>
                     ))}

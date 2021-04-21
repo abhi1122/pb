@@ -88,6 +88,16 @@ class CategoryList extends React.Component {
     });
   }
 
+  goEdit = (id) => {
+    console.log(id, '...');
+    this.props.history.push({
+      pathname: `/admin/categories/edit-child/${id}/${id}`,
+      state: {
+        id,
+      },
+    });
+  };
+
   render() {
     const { parentId, parentName, parentSlugName } = this.state;
     const pageName = this.state.parentName ? this.state.parentName : 'Business';
@@ -156,6 +166,15 @@ class CategoryList extends React.Component {
                         <StatusBadge status={row.status} />
                       </td>
                       <td>
+                        <a
+                          href='javascript:void(0);'
+                          onClick={() => this.goEdit(row._id)}
+                        >
+                          <Badge color='primary' className='mr-xs'>
+                            Edit
+                          </Badge>
+                        </a>
+                        {'  '}
                         <a href='javascript:void(0)'>
                           <Badge
                             color='success'
@@ -172,9 +191,6 @@ class CategoryList extends React.Component {
                             Manage Sub-Category
                           </Badge>
                         </a>
-                        <br />
-                        <Badge color='primary'>Edit</Badge>
-                        <Badge color='danger'>Active</Badge>
                       </td>
                     </tr>
                   ))}
