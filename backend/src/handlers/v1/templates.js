@@ -87,13 +87,13 @@ export class Templates {
   }
 
   async update(req) {
-    const { _id, texts } = req.body;
+    const { _id, texts, logo } = req.body;
     //templatesData.logo = JSON.parse(req.body.logo);
     //templatesData.texts = JSON.parse(req.body.texts);
     //templatesData.url = req.body.url;
     //const doc = new templatesModel(templatesData);
-    console.log(texts, '.....texts');
-    return await templatesModel.updateMany({ _id }, { $set: { texts } });
+    //console.log(logo, '.....texts');
+    return await templatesModel.updateMany({ _id }, { $set: { texts, logo } });
 
     // return await doc.update(
     //   { _id: req.body._id },
@@ -116,14 +116,70 @@ export class Templates {
     // });
   }
 
+  getLogoAxis(width, height, logoWidth, logoHeight, position) {
+    let axis = { x: 0, y: 0 };
+    switch (position) {
+      case 'right':
+        return { x: width - logoWidth, y: 0 };
+      case 'right-bottom':
+        return { x: width - logoWidth, y: height - logoHeight };
+      case 'left-bottom':
+        return { x: 0, y: height - logoHeight };
+      case 'center':
+        return { x: width / 2 - logoWidth / 2, y: height / 2 - logoHeight / 2 };
+      case 'top-center':
+        return { x: width / 2 - logoWidth / 2, y: 0 };
+      case 'bottom-center':
+        return {
+          x: width / 2 - logoWidth / 2,
+          y: height - logoHeight,
+        };
+      case 'center-left':
+        return {
+          x: 0,
+          y: height / 2 - logoHeight / 2,
+        };
+      case 'center-right':
+        return {
+          x: width - logoWidth,
+          y: height / 2 - logoHeight / 2,
+        };
+      default:
+        return axis;
+    }
+  }
+
   async demoDownload(req) {
     const templateData = await templatesModel.findOne({ _id: req.params.id });
     //fontsModel.findOne({ _id: templateData.id })
     // image.composite( src, x, y, [{ mode, opacitySource, opacityDest }] );
     console.log(templateData, '...templatesData');
-    const { texts, url, logo = [] } = templateData;
+    const {
+      texts,
+      url,
+      logo: [logoPos],
+    } = templateData;
     await Jimp.read(url)
-      .then((image) => {
+      .then(async (image) => {
+        console.log(logoPos, '..........logoPos');
+        if (logoPos.slug !== 'none') {
+          const { width, height } = image.bitmap;
+          const logo = await Jimp.read(`public/images/logo.png`);
+          const logoWidth = logo.bitmap.width;
+          const logoHeight = logo.bitmap.height;
+          console.log(width, height, '.....width, height');
+          console.log(logoWidth, logoHeight, '.....logo');
+          const logoAxis = this.getLogoAxis(
+            width,
+            height,
+            logoWidth,
+            logoHeight,
+            logoPos.slug
+          );
+          console.log(logoAxis, '.......logoAxis');
+          await image.composite(logo, logoAxis.x, logoAxis.y);
+        }
+
         texts.map(async (text) => {
           const fontsData = await fontsModel.findOne({
             _id: text.font,
@@ -133,7 +189,7 @@ export class Templates {
           );
           console.log(fontsData.name, '.....fontsData');
           const loadFont = await Jimp.loadFont(selectedFont.path);
-          image
+          await image
             .print(loadFont, Number(text.x), Number(text.y), text.text)
             .write(`public/img-load/demo-template.jpeg`);
         });

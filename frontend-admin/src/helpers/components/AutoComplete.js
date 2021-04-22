@@ -6,6 +6,11 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   label: {
     display: 'block',
+    fontSize: '14px',
+    padding: 0,
+    margin: 0,
+    marginBottom: '2px',
+    color: 'white',
   },
   input: {
     width: '100%',
@@ -13,20 +18,20 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#12142B',
     opacity: 0.8,
     border: 'none',
-    color: 'rgba(244, 244, 245, 0.9)',
+    color: 'white',
+    fontSize: '15px',
   },
   listbox: {
-    width: '100%',
+    width: '90%',
     margin: 0,
     padding: 0,
     zIndex: 1,
     position: 'absolute',
     listStyle: 'none',
-    backgroundColor: theme.palette.background.paper,
     overflow: 'auto',
     maxHeight: 200,
     backgroundColor: '#12142B',
-    opacity: 0.8,
+    opacity: 1,
     border: 'none',
     color: 'rgba(244, 244, 245, 0.9)',
     '& li[data-focus="true"]': {

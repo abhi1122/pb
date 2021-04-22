@@ -8,6 +8,14 @@ export const SET_AXIS = 'SET_AXIS';
 export const FORM_CHANGE = 'FORM_CHANGE';
 export const DOWNLOAD_URL = 'DOWNLOAD_URL';
 export const SAVED_AXIS = 'SAVED_AXIS';
+export const SET_LOGO = 'SET_LOGO';
+
+export function setLogo(data) {
+  return {
+    type: SET_LOGO,
+    playLoad: data,
+  };
+}
 
 export function formChange(data) {
   return {

@@ -14,12 +14,13 @@ const templates = new Schema({
     },
   ],
   // logo: { type: [{ x: Number, y: Number }] },
-  logo: [
-    {
-      x: { type: Number, required: true },
-      y: { type: Number, required: true },
-    },
-  ],
+  // logo: [
+  //   {
+  //     x: { type: Number, required: true },
+  //     y: { type: Number, required: true },
+  //   },
+  // ],
+  logo: Array,
   description: { type: String, required: false },
   status: { type: Boolean, default: false },
   file: Object,

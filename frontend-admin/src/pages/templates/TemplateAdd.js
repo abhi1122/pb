@@ -23,6 +23,7 @@ import {
   InputValidationError,
   SectionHeader,
 } from '../../helpers/components/common-ui';
+import mainLogo from '../../assets/testlogo.png';
 
 import {
   getList,
@@ -32,6 +33,7 @@ import {
   downloadTemplate,
   loadEditTemplate,
   formChange,
+  setLogo,
 } from '../../actions/template';
 
 import { getList as getCategoryList } from '../../actions/category';
@@ -57,8 +59,10 @@ class TemplateAdd extends React.Component {
       valueNew: 1,
       addPopup: false,
       url: '',
+      label_color: 'black',
     };
     this.inputRef = React.createRef();
+    this.logoRef = React.createRef();
   }
 
   componentDidMount() {
@@ -112,8 +116,10 @@ class TemplateAdd extends React.Component {
     const { offsetTop, offsetLeft } = this.inputRef.current;
     let elem = document.querySelector('#myimg');
     let rect = elem.getBoundingClientRect();
+
     console.log(e.pageX, rect.x, 'X------------');
     console.log(e.pageY, rect.y, 'Y------------');
+
     const x = e.pageX - rect.x;
     const y = e.pageY - rect.y - 14;
     const labelsArr =
@@ -150,12 +156,13 @@ class TemplateAdd extends React.Component {
     });
   };
 
-  updateTemplate = (axis) => {
+  updateTemplate = (axis, logo) => {
     axis['_id'] = this.state.id;
-    //console.log(axis, '......axis');
+    //console.log(, '......axis');
     const updateBody = {};
     updateBody['_id'] = this.state.id;
     updateBody.texts = axis;
+    updateBody.logo = logo;
     this.props.dispatch(updateTemplate(updateBody));
     //this.setState({ valueNew: axis });
   };
@@ -167,6 +174,71 @@ class TemplateAdd extends React.Component {
   setCategory = (val) => {
     console.log(val, 'selected........OK');
     this.props.dispatch(formChange({ category_id: val._id }));
+  };
+
+  setColor = (val) => {
+    console.log(val, 'setColor........OK');
+    this.setState({ label_color: val.name });
+  };
+
+  setPosition = (val) => {
+    // console.log(
+    //   val,
+    //   this.inputRef.current.clientHeight,
+    //   'setPosition........OK'
+    // );
+    console.log('call........', val);
+    if (val && val.slug !== 'none') {
+      const logoAxis = this.getLogoAxis(val.slug);
+      //console.log(logoAxis, '.......logoAxis');
+      this.props.dispatch(setLogo([{ ...val, ...logoAxis }]));
+    } else {
+      this.props.dispatch(setLogo([{ name: 'NO LOGO', slug: 'none' }]));
+    }
+
+    // this.setState({ label_color: val.name });
+    //this.inputRef.current.clientHeight
+  };
+
+  getLogoAxis = (slug) => {
+    const { clientHeight, clientWidth } = this.inputRef.current;
+    const logoHeight = this.logoRef.current.clientHeight;
+    const logoWidth = this.logoRef.current.clientWidth;
+    console.log(clientHeight, clientWidth, '.....clientHeight, clientWidth');
+    console.log(logoHeight, logoWidth, '.....logoWidth, logoWidth');
+    let axis = { x: 0, y: 0 };
+    switch (slug) {
+      case 'right':
+        return { x: clientWidth - logoWidth, y: 0 };
+      case 'right-bottom':
+        return { x: clientWidth - logoWidth, y: clientHeight - logoHeight };
+      case 'left-bottom':
+        return { x: 0, y: clientHeight - logoHeight };
+      case 'top-center':
+        return { x: clientWidth / 2 - logoWidth / 2, y: 0 };
+      case 'bottom-center':
+        return {
+          x: clientWidth / 2 - logoWidth / 2,
+          y: clientHeight - logoHeight,
+        };
+      case 'center-left':
+        return {
+          x: 0,
+          y: clientHeight / 2 - logoHeight / 2,
+        };
+      case 'center-right':
+        return {
+          x: clientWidth - logoWidth,
+          y: clientHeight / 2 - logoHeight / 2,
+        };
+      case 'center':
+        return {
+          x: clientWidth / 2 - logoWidth / 2,
+          y: clientHeight / 2 - logoHeight / 2,
+        };
+      default:
+        return axis;
+    }
   };
 
   changeCheck = (e) => {
@@ -186,12 +258,38 @@ class TemplateAdd extends React.Component {
     return this.props.categoryList.find((val) => val._id === id);
   };
   render() {
-    const { axis = [], downloadUrl = false, setAxisSaved = false } = this.props;
-    console.log(this.props, 'Template parent is calling..........');
+    console.log(this.props.logo, '.........this.props.logothis.props.logo');
+    const colorArr = [
+      { name: 'Black' },
+      { name: 'White' },
+      { name: 'Red' },
+      { name: 'Orange' },
+      { name: 'Yellow' },
+      { name: 'Green' },
+    ];
+    const positionArr = [
+      { name: 'NO LOGO', slug: 'none' },
+      { name: 'TOP LEFT', slug: 'left' },
+      { name: 'TOP RIGHT', slug: 'right' },
+      { name: 'TOP CENTER', slug: 'top-center' },
+      { name: 'BOTTOM LEFT', slug: 'left-bottom' },
+      { name: 'BOTTOM RIGHT', slug: 'right-bottom' },
+      { name: 'BOTTOM CENTER', slug: 'bottom-center' },
+      { name: 'CENTER', slug: 'center' },
+      { name: 'CENTER LEFT', slug: 'center-left' },
+      { name: 'CENTER RIGHT', slug: 'center-right' },
+    ];
+    const {
+      axis = [],
+      downloadUrl = false,
+      setAxisSaved = false,
+      logo = [],
+    } = this.props;
+    console.log(logo, 'fonts Template parent is calling..........');
     if (this.props.saved) {
       return <Redirect to='/admin/template' />;
     }
-    if (downloadUrl) {
+    if (downloadUrl !== '') {
       window.open(downloadUrl);
     }
     return (
@@ -291,28 +389,116 @@ class TemplateAdd extends React.Component {
               </form>
               <Modal size='lg' isOpen={this.state.addPopup}>
                 <ModalHeader
+                  style={{ width: '100%' }}
                   toggle={() => this.props.history.push('/admin/template')}
                 >
-                  {setAxisSaved ? (
-                    <span>
-                      Setting Your Template...
-                      <Icon
-                        className='fa fa-spinner fa-spin'
-                        style={{
-                          color: 'white',
-                          float: 'center',
-                        }}
+                  <div
+                    style={{ width: '100%', display: 'flex', height: '50px' }}
+                  >
+                    {/* {setAxisSaved ? (
+                      <span>
+                        Setting Your Template...
+                        <Icon
+                          className='fa fa-spinner fa-spin'
+                          style={{
+                            color: 'white',
+                            float: 'center',
+                          }}
+                        />
+                      </span>
+                    ) : (
+                      <span>Create You Template</span>
+                    )} */}
+
+                    <div
+                      style={{
+                        float: 'right',
+                        paddingRight: '20px',
+                        width: '200px',
+                        position: 'absolute',
+                      }}
+                    >
+                      <AutocompleteUi
+                        label='Select Label color'
+                        data={colorArr}
+                        labelKey='name'
+                        callBack={(selected) => this.setColor(selected)}
+                        selected={colorArr[0]}
                       />
-                    </span>
-                  ) : (
-                    <span>Create You Template</span>
-                  )}
+                    </div>
+
+                    <div
+                      style={{
+                        float: 'right',
+                        paddingRight: '20px',
+                        width: '200px',
+                        position: 'absolute',
+                        marginLeft: '13%',
+                      }}
+                    >
+                      <AutocompleteUi
+                        label='Select Logo Position'
+                        data={positionArr}
+                        labelKey='name'
+                        callBack={(selected) => this.setPosition(selected)}
+                        selected={positionArr[0]}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        float: 'right',
+                        //paddingRight: '20px',
+                        //width: '200px',
+                        position: 'absolute',
+                        marginLeft: '80%',
+                      }}
+                    >
+                      {setAxisSaved ? (
+                        <span>
+                          Setting Your Template...
+                          <Icon
+                            className='fa fa-spinner fa-spin'
+                            style={{
+                              color: 'white',
+                            }}
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          <Button
+                            color='primary'
+                            onClick={() => this.downloadTemplate()}
+                          >
+                            Download Template
+                          </Button>
+                          {'  '}
+                          <Button
+                            color='success'
+                            onClick={() => this.updateTemplate(axis, logo)}
+                          >
+                            Save changes
+                          </Button>
+                          {'  '}
+                          <Button
+                            color='danger'
+                            onClick={() =>
+                              this.props.history.push('/admin/template')
+                            }
+                          >
+                            Close
+                          </Button>
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </ModalHeader>
                 <ModalBody
                   className='bg-white2'
                   style={{
                     backgroundColor: '#12142B',
                     padding: '0px',
+                    height: '100vh',
                   }}
                 >
                   <div>
@@ -328,6 +514,22 @@ class TemplateAdd extends React.Component {
                       }}
                     />
                     <div id='imageDiv'>
+                      <img
+                        id='logo'
+                        alt=''
+                        src={mainLogo}
+                        ref={this.logoRef}
+                        style={{
+                          display:
+                            this.props.logo[0].slug === 'none'
+                              ? 'none'
+                              : 'inline-block',
+                          position: 'absolute',
+                          top: `${this.props.logo[0].y}px`,
+                          left: `${this.props.logo[0].x}px`,
+                        }}
+                      />
+
                       {axis.map((data) => {
                         return (
                           <div
@@ -335,7 +537,7 @@ class TemplateAdd extends React.Component {
                             style={{
                               fontWeight: 'bold',
                               backgroundColor: 'none',
-                              color: 'black',
+                              color: this.state.label_color,
                               fontSize: '16px',
                               position: 'absolute',
                               top: `${data.y}px`,
@@ -352,7 +554,7 @@ class TemplateAdd extends React.Component {
                         <div
                           style={{
                             width: '300px',
-                            height: '700px',
+                            height: '100vh',
                             overflow: 'scroll',
                             position: 'absolute',
                             backgroundColor: '#1b1e3c',
@@ -371,8 +573,8 @@ class TemplateAdd extends React.Component {
                     </div>
                   </div>
                 </ModalBody>
-                <ModalFooter>
-                  {setAxisSaved ? (
+                {/* <ModalFooter> */}
+                {/* {setAxisSaved ? (
                     <span>
                       Setting Your Template...
                       <Icon
@@ -402,13 +604,13 @@ class TemplateAdd extends React.Component {
                       {'  '}
                       <Button
                         color='primary'
-                        onClick={() => this.updateTemplate(axis)}
+                        onClick={() => this.updateTemplate(axis, logo)}
                       >
                         Save changes
                       </Button>
                     </span>
-                  )}
-                </ModalFooter>
+                  )} */}
+                {/* </ModalFooter> */}
               </Modal>
             </Widget>
           </Col>
@@ -437,6 +639,7 @@ function mapStateToProps(state) {
     saved: state.categories.saved,
     errors: state.categories.errors,
     axis: state.template.axis,
+    logo: state.template.logo,
     categoryList: state.categories.list,
     formData: state.template.formData,
     fontList: state.fonts.list,
@@ -527,151 +730,164 @@ const SaveTemplateForm = ({ props, updateAxisRedux }) => {
     return fontList.find((font) => font._id === id);
   };
 
-  return axis.map((data) => {
-    return (
-      <div
-        style={{
-          borderBottom: '1px dashed white',
-        }}
-      >
-        <FormGroup className='mt'>
-          <Label
-            for='name'
-            style={{
-              fontWeight: 'bold',
-              color: 'white',
-            }}
-          >
-            Manage {data.name}
-            Details
-          </Label>
-          <Icon
-            className='fa fa-trash'
-            style={{
-              color: '#EC0607',
-              float: 'right',
-              marginTop: '1px',
-            }}
-            onClick={() => deleteAxis(data.index)}
-          />
-          <AutocompleteUi
-            label='Select Fonts'
-            data={props.fontList}
-            labelKey='name'
-            callBack={(selected) => setFonts(selected, data.index, 'font')}
-            selected={getFontObjById(data.font)}
-          />
-          <InputGroup
-            className='input-group-no-border'
-            style={{
-              paddingTop: '5px',
-            }}
-          >
-            <Input
-              id={`label${data.index}`}
-              className='input-transparent pl-3'
-              onChange={(e) => changeInput(e, data.index, 'label')}
-              value={data.label}
-              type='text'
-              name={`label${data.index}`}
-              placeholder={data.name}
-            />
-          </InputGroup>
-          <InputGroup
-            className='input-group-no-border'
-            style={{
-              paddingTop: '5px',
-            }}
-          >
-            <Input
-              id={`label${data.index}`}
-              className='input-transparent pl-3'
-              onChange={(e) => changeInput(e, data.index, 'text')}
-              value={data.text}
-              type='text'
-              name={`label${data.index}`}
-              placeholder='Sample Text'
-            />
-          </InputGroup>
-          <InputGroup
-            className='input-group-no-border'
-            style={{
-              paddingTop: '5px',
-            }}
-          >
-            <span
+  return axis.length === 0 ? (
+    <>
+      <h1>Please click on image and select your AXIS</h1>
+      <h5>For additional info please contact admin</h5>
+    </>
+  ) : (
+    axis.map((data) => {
+      return (
+        <div
+          style={{
+            borderBottom: '3px solid #12152e',
+          }}
+        >
+          <FormGroup className='mt'>
+            <Label
+              for='name'
               style={{
                 fontWeight: 'bold',
-                marginTop: '9px',
+                color: 'white',
               }}
             >
-              X - AXIS
-            </span>
-            <Input
-              id={`label${data.index}`}
-              className='input-transparent pl-3'
-              onChange={(e) => changeInput(e, data.index, `x`)}
-              value={data.x}
-              type='text'
-              name={`label${data.index}x`}
-            />
+              Manage {data.name}
+              Details
+            </Label>
             <Icon
-              className='fa fa-arrow-circle-left'
+              className='fa fa-trash'
               style={{
-                color: 'white',
+                color: '#EC0607',
+                float: 'right',
+                marginTop: '1px',
               }}
-              onClick={() => updateAxis('x', -1, data.index)}
+              onClick={() => deleteAxis(data.index)}
             />
-            <Icon
-              className='fa fa-arrow-circle-right'
-              style={{
-                color: 'white',
-              }}
-              onClick={() => updateAxis('x', 1, data.index)}
+            <AutocompleteUi
+              label='Select Font'
+              data={props.fontList}
+              labelKey='name'
+              callBack={(selected) => setFonts(selected, data.index, 'font')}
+              selected={getFontObjById(data.font)}
             />
-          </InputGroup>
-          <InputGroup
-            className='input-group-no-border'
-            style={{
-              paddingTop: '5px',
-            }}
-          >
-            <span
+            <InputGroup
+              className='input-group-no-border'
               style={{
-                fontWeight: 'bold',
-                marginTop: '9px',
+                paddingTop: '5px',
               }}
             >
-              Y - AXIS
-            </span>
-            <Input
-              id={`label${data.index}`}
-              className='input-transparent pl-3'
-              onChange={(e) => changeInput(e, data.index, `y`)}
-              value={data.y}
-              type='text'
-              name={`label${data.index}y`}
-            />
-            <Icon
-              className='fa fa-arrow-circle-down'
+              <Input
+                id={`label${data.index}`}
+                className='input-transparent pl-3'
+                onChange={(e) => changeInput(e, data.index, 'label')}
+                value={data.label}
+                type='text'
+                name={`label${data.index}`}
+                placeholder='Name'
+              />
+            </InputGroup>
+            <InputGroup
+              className='input-group-no-border'
               style={{
-                color: 'white',
+                paddingTop: '5px',
               }}
-              onClick={() => updateAxis('y', 1, data.index)}
-            />
-            <Icon
-              className='fa fa-arrow-circle-up'
+            >
+              <Input
+                id={`label${data.index}`}
+                className='input-transparent pl-3'
+                onChange={(e) => changeInput(e, data.index, 'text')}
+                value={data.text}
+                type='text'
+                name={`label${data.index}`}
+                placeholder='Sample Text'
+              />
+            </InputGroup>
+            <InputGroup
+              className='input-group-no-border'
               style={{
-                color: 'white',
+                paddingTop: '5px',
               }}
-              onClick={() => updateAxis('y', -1, data.index)}
-            />
-          </InputGroup>
-          {/* <InputValidationError error={this.props.errors.name} /> */}
-        </FormGroup>
-      </div>
-    );
-  });
+            >
+              <span
+                style={{
+                  fontWeight: 'bold',
+                  marginTop: '9px',
+                  marginRight: '10px',
+                }}
+              >
+                X - AXIS
+              </span>
+              <Input
+                id={`label${data.index}`}
+                className='input-transparent pl-3'
+                onChange={(e) => changeInput(e, data.index, `x`)}
+                value={data.x}
+                type='number'
+                name={`label${data.index}x`}
+              />
+              <Icon
+                className='fa fa-arrow-circle-left'
+                style={{
+                  color: 'white',
+                  marginTop: '9px',
+                }}
+                onClick={() => updateAxis('x', -1, data.index)}
+              />
+              <Icon
+                className='fa fa-arrow-circle-right'
+                style={{
+                  color: 'white',
+                  marginTop: '9px',
+                }}
+                onClick={() => updateAxis('x', 1, data.index)}
+              />
+            </InputGroup>
+            <InputGroup
+              className='input-group-no-border'
+              style={{
+                paddingTop: '5px',
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: 'bold',
+                  marginTop: '9px',
+                  marginRight: '10px',
+                }}
+              >
+                Y - AXIS
+              </span>
+              <Input
+                id={`label${data.index}`}
+                className='input-transparent pl-3'
+                onChange={(e) => changeInput(e, data.index, `y`)}
+                value={data.y}
+                type='number'
+                name={`label${data.index}y`}
+              />
+              <Icon
+                className='fa fa-arrow-circle-down'
+                style={{
+                  color: 'white',
+                  marginTop: '9px',
+                }}
+                onClick={() => updateAxis('y', 1, data.index)}
+              />
+              <Icon
+                className='fa fa-arrow-circle-up'
+                style={{
+                  color: 'white',
+                  marginTop: '9px',
+                }}
+                onClick={() => updateAxis('y', -1, data.index)}
+              />
+            </InputGroup>
+            {/* <InputValidationError error={this.props.errors.name} /> */}
+          </FormGroup>
+        </div>
+      );
+    })
+  );
 };
 
 // function mapStateToPropsF(state) {

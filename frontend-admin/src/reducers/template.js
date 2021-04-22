@@ -7,6 +7,7 @@ import {
   DOWNLOAD_URL,
   SAVED_AXIS,
   LOAD_EDIT,
+  SET_LOGO,
 } from '../actions/template';
 
 const defaultState = {
@@ -17,6 +18,7 @@ const defaultState = {
   formData: { status: true },
   downloadUrl: '',
   setAxis: false,
+  logo: [{ name: 'NONE', slug: 'none' }],
 };
 export default function template(state = defaultState, action = {}) {
   switch (action.type) {
@@ -26,9 +28,10 @@ export default function template(state = defaultState, action = {}) {
         list: action.playLoad,
         errors: {},
         saved: false,
-        downloadUrl: '',
+        downloadUrl: defaultState.downloadUrl,
         setAxis: false,
         formData: defaultState.formData,
+        logo: defaultState.logo,
       };
     case LOAD_EDIT:
       return {
@@ -36,38 +39,52 @@ export default function template(state = defaultState, action = {}) {
         list: [],
         errors: {},
         saved: false,
-        downloadUrl: '',
+        downloadUrl: defaultState.downloadUrl,
         setAxis: false,
+        logo: defaultState.logo,
         formData: action.playLoad.length
           ? action.playLoad[0]
           : defaultState.formData,
       };
     case SAVED_FORM:
-      return { ...state, saved: true, downloadUrl: '', setAxis: false };
+      return {
+        ...state,
+        saved: true,
+        downloadUrl: defaultState.downloadUrl,
+        setAxis: false,
+      };
     case SAVE_ERROR:
       return {
         ...state,
         errors: action.playLoad,
-        downloadUrl: '',
+        downloadUrl: defaultState.downloadUrl,
         setAxis: false,
       };
     case SET_AXIS:
       return {
         ...state,
         axis: action.playLoad,
-        downloadUrl: '',
+        downloadUrl: defaultState.downloadUrl,
         setAxis: false,
+      };
+    case SET_LOGO:
+      return {
+        ...state,
+        downloadUrl: defaultState.downloadUrl,
+        setAxis: false,
+        logo: action.playLoad,
       };
     case SAVED_AXIS:
       return {
         ...state,
         ...action.playLoad,
+        downloadUrl: defaultState.downloadUrl,
       };
     case FORM_CHANGE:
       return {
         ...state,
         formData: { ...state.formData, ...action.playLoad },
-        downloadUrl: '',
+        downloadUrl: defaultState.downloadUrl,
         setAxis: false,
       };
     case DOWNLOAD_URL:
