@@ -9,7 +9,7 @@
 
   ul > li > a {
     padding: 0.5rem 12px;
-    @media(max-width: 580px) {
+    @media (max-width: 580px) {
       padding: 0.5rem 6px;
     }
   }
@@ -21,7 +21,7 @@
       display: block;
       margin: 0;
       transition: margin-top 0.2s ease;
-      background: #12142B80;
+      background: #12142b80;
       border: none;
       font-size: 1rem;
       line-height: 20px;
@@ -32,7 +32,7 @@
       @media (max-width: 1255px) {
         display: none !important;
       }
-    
+
       button.close {
         color: $icon-blue;
         font-weight: normal;
@@ -68,8 +68,6 @@
   &:focus {
     color: $white;
   }
-
-
 
   @media (max-width: breakpoint-max(sm)) {
     top: 10px;
@@ -163,7 +161,7 @@
 }
 
 .glyphicon {
-  color: #3979F6;
+  color: #3979f6;
 }
 
 .image {
@@ -180,7 +178,7 @@
 
 .dropdownMenu {
   background: $main-background !important;
-  box-shadow: 0 0px 40px 2px rgba(#020202,.5);
+  box-shadow: 0 0px 40px 2px rgba(#020202, 0.5);
   border: none;
   color: $white;
 
@@ -311,7 +309,7 @@
   height: 6px;
   bottom: 8px;
   right: 5px;
-  background: $green; 
+  background: $green;
   color: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
 }
@@ -319,7 +317,7 @@
 .notificationsMenu {
   padding: 0 12px;
   > a {
-    background-color: transparent!important;    
+    background-color: transparent !important;
   }
 
   :global .dropdown-menu {
@@ -333,7 +331,7 @@
     margin: 0;
   }
 
-  @media(max-width: 580px) {
+  @media (max-width: 580px) {
     :global .dropdown-menu {
       right: -50% !important;
     }
@@ -374,7 +372,7 @@
   height: 22px;
   margin: auto 6px;
   border-radius: 50%;
-  color: #1B1E3F;
+  color: #1b1e3f;
   font-size: 12px;
   font-weight: $font-weight-bold;
 }
@@ -397,6 +395,6 @@
 }
 
 .inputGroupText {
-  background: #12142B;
-  opacity: .8;
+  background: #12142b;
+  opacity: 0.8;
 }

@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
 const templates = new Schema({
   name: { type: String, required: false, trim: true },
   category_id: { type: String, required: true, trim: true },
-  url: { type: String, required: true },
+  url: { type: String, required: false },
   texts: [
     {
       x: { type: Number, required: true },
@@ -14,14 +14,16 @@ const templates = new Schema({
     },
   ],
   // logo: { type: [{ x: Number, y: Number }] },
-  logo: [
-    {
-      x: { type: Number, required: true },
-      y: { type: Number, required: true },
-    },
-  ],
+  // logo: [
+  //   {
+  //     x: { type: Number, required: true },
+  //     y: { type: Number, required: true },
+  //   },
+  // ],
+  logo: Array,
   description: { type: String, required: false },
-  isDeleted: { type: Boolean, default: false },
+  status: { type: Boolean, default: false },
+  file: Object,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

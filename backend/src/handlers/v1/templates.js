@@ -1,7 +1,9 @@
 import { templatesModel } from '../../models/Templates';
 import { fontsModel } from '../../models/Fonts';
-import { getQueryBody } from '../../utils/helper';
+import { getQueryBody, getHeaderBody } from '../../utils/helper';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import { cloudImageUploader, fontUploader } from '../../utils/upload';
+import { imageUploadConfig } from '../../../config/constants/index';
 import Jimp from 'jimp';
 
 export class Templates {
@@ -12,23 +14,86 @@ export class Templates {
     return await templatesModel.find(searchQuery, [], { sort, skip, limit });
   }
 
+  async edit(req) {
+    const headBody = getHeaderBody(req);
+    const checkValid = new templatesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+    const skipImage = true;
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination,
+      skipImage
+    );
+
+    if (skipImage || !req.fileUploadError.status) {
+      if (req.fileUploadRes && req.fileUploadRes.url) {
+        req.body.file = req.fileUploadRes;
+        req.body.url = req.fileUploadRes.url;
+      }
+
+      const { id } = req.body;
+      delete req.body.id;
+      console.log(req.body, '.........req.body');
+      return await templatesModel.updateMany(
+        { _id: id },
+        { $set: { ...req.body } }
+      );
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
+  }
+
   async save(req) {
-    const templatesData = req.body;
-    templatesData.logo = JSON.parse(req.body.logo);
-    templatesData.texts = JSON.parse(req.body.texts);
-    templatesData.url = req.body.url;
-    const doc = new templatesModel(templatesData);
-    return await doc.save(templatesData);
+    const headBody = getHeaderBody(req);
+    const checkValid = new templatesModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+
+    await cloudImageUploader(
+      req,
+      imageUploadConfig.name,
+      imageUploadConfig.files,
+      imageUploadConfig.destination
+    );
+
+    if (!req.fileUploadError.status) {
+      req.body.file = req.fileUploadRes;
+      req.body.url = req.fileUploadRes.url;
+      const doc = new templatesModel(req.body);
+      return await doc.save(req.body);
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = {
+        image: req.fileUploadError.message,
+      };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
+
+    // const templatesData = req.body;
+    // templatesData.logo = JSON.parse(req.body.logo);
+    // templatesData.texts = JSON.parse(req.body.texts);
+    // templatesData.url = req.body.url;
+    // const doc = new templatesModel(templatesData);
+    // return await doc.save(templatesData);
   }
 
   async update(req) {
-    const { _id, texts } = req.body;
+    const { _id, texts, logo } = req.body;
     //templatesData.logo = JSON.parse(req.body.logo);
     //templatesData.texts = JSON.parse(req.body.texts);
     //templatesData.url = req.body.url;
     //const doc = new templatesModel(templatesData);
-    console.log(texts, '.....texts');
-    return await templatesModel.updateMany({ _id }, { $set: { texts } });
+    //console.log(logo, '.....texts');
+    return await templatesModel.updateMany({ _id }, { $set: { texts, logo } });
 
     // return await doc.update(
     //   { _id: req.body._id },
@@ -51,13 +116,70 @@ export class Templates {
     // });
   }
 
+  getLogoAxis(width, height, logoWidth, logoHeight, position) {
+    let axis = { x: 0, y: 0 };
+    switch (position) {
+      case 'right':
+        return { x: width - logoWidth, y: 0 };
+      case 'right-bottom':
+        return { x: width - logoWidth, y: height - logoHeight };
+      case 'left-bottom':
+        return { x: 0, y: height - logoHeight };
+      case 'center':
+        return { x: width / 2 - logoWidth / 2, y: height / 2 - logoHeight / 2 };
+      case 'top-center':
+        return { x: width / 2 - logoWidth / 2, y: 0 };
+      case 'bottom-center':
+        return {
+          x: width / 2 - logoWidth / 2,
+          y: height - logoHeight,
+        };
+      case 'center-left':
+        return {
+          x: 0,
+          y: height / 2 - logoHeight / 2,
+        };
+      case 'center-right':
+        return {
+          x: width - logoWidth,
+          y: height / 2 - logoHeight / 2,
+        };
+      default:
+        return axis;
+    }
+  }
+
   async demoDownload(req) {
     const templateData = await templatesModel.findOne({ _id: req.params.id });
     //fontsModel.findOne({ _id: templateData.id })
+    // image.composite( src, x, y, [{ mode, opacitySource, opacityDest }] );
     console.log(templateData, '...templatesData');
-    const { texts, url } = templateData;
+    const {
+      texts,
+      url,
+      logo: [logoPos],
+    } = templateData;
     await Jimp.read(url)
-      .then((image) => {
+      .then(async (image) => {
+        console.log(logoPos, '..........logoPos');
+        if (logoPos.slug !== 'none') {
+          const { width, height } = image.bitmap;
+          const logo = await Jimp.read(`public/images/logo.png`);
+          const logoWidth = logo.bitmap.width;
+          const logoHeight = logo.bitmap.height;
+          console.log(width, height, '.....width, height');
+          console.log(logoWidth, logoHeight, '.....logo');
+          const logoAxis = this.getLogoAxis(
+            width,
+            height,
+            logoWidth,
+            logoHeight,
+            logoPos.slug
+          );
+          console.log(logoAxis, '.......logoAxis');
+          await image.composite(logo, logoAxis.x, logoAxis.y);
+        }
+
         texts.map(async (text) => {
           const fontsData = await fontsModel.findOne({
             _id: text.font,
@@ -67,10 +189,19 @@ export class Templates {
           );
           console.log(fontsData.name, '.....fontsData');
           const loadFont = await Jimp.loadFont(selectedFont.path);
-          image
+          await image
             .print(loadFont, Number(text.x), Number(text.y), text.text)
-            .write(`public/img-load/test2.jpeg`);
+            .write(`public/img-load/demo-template.jpeg`);
         });
+
+        // Promise.all([promise1, promise2, promise3]).then((values) => {
+        //   console.log(values);
+        // });
+
+        resolve({ url: `public/img-load/demo-template.jpeg` });
+        // return new Promise((resolve) =>
+        //   resolve({ url: `public/img-load/demo-template.jpeg` })
+        // );
 
         // Jimp.loadFont('public/Montserrat-Regular.ttf.fnt')
         //   .then((font) => {
@@ -90,5 +221,11 @@ export class Templates {
       .catch((err) => {
         console.error(err);
       });
+
+    return new Promise((resolve) =>
+      resolve({
+        url: `${req.protocol}://${req.get('host')}/img-load/demo-template.jpeg`,
+      })
+    );
   }
 }

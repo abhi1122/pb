@@ -27,6 +27,8 @@ import Jimp from 'jimp';
 //     "__v": 0
 // }
 
+//image.composite( src, x, y, [{ mode, opacitySource, opacityDest }] );
+
 const createImage = (templateData) => {
   const { texts = [] } = templateData;
   Jimp.read(templateData.url)

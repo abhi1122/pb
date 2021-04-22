@@ -1,13 +1,33 @@
 import { callHttpRequest } from '../helpers/services';
 
-export const LOAD_LIST = 'LOAD_LIST';
+export const LOAD_LIST = 'TEMPLATE_LOAD_LIST';
+export const LOAD_EDIT = 'TEMPLATE_LOAD_EDIT';
 export const SAVED_FORM = 'SAVED_FORM';
 export const SAVE_ERROR = 'SAVE_ERROR';
 export const SET_AXIS = 'SET_AXIS';
+export const FORM_CHANGE = 'FORM_CHANGE';
+export const DOWNLOAD_URL = 'DOWNLOAD_URL';
+export const SAVED_AXIS = 'SAVED_AXIS';
+export const SET_LOGO = 'SET_LOGO';
 
-export function loadList(data) {
+export function setLogo(data) {
   return {
-    type: LOAD_LIST,
+    type: SET_LOGO,
+    playLoad: data,
+  };
+}
+
+export function formChange(data) {
+  return {
+    type: FORM_CHANGE,
+    playLoad: data,
+  };
+}
+
+export function loadList(data, isEdit = false) {
+  const type = isEdit ? LOAD_EDIT : LOAD_LIST;
+  return {
+    type: type,
     playLoad: data,
   };
 }
@@ -28,16 +48,16 @@ function savedForm() {
 
 function loadError(errors) {
   return {
-    type: SAVE_ERROR,
+    type: SAVED_AXIS,
     playLoad: errors,
   };
 }
 
-export function getList(query) {
+export function getList(query, isEdit = false) {
   return async (dispatch) => {
     const { data } = await callHttpRequest('post', 'templates/list', query);
     console.log(data, '.ppopodata.....poop.');
-    dispatch(loadList(data));
+    dispatch(loadList(data, isEdit));
   };
 }
 
@@ -49,12 +69,19 @@ export function setAxisCall(data) {
 
 export function updateTemplate(formData) {
   return async (dispatch) => {
+    dispatch(savedAxis({ setAxis: true }));
     const { data } = await callHttpRequest(
       'post',
       'templates/update',
       formData
     );
-    // dispatch(loadList(data));
+    dispatch(savedAxis({ setAxis: false }));
+  };
+}
+function savedAxis(data) {
+  return {
+    type: SAVED_AXIS,
+    playLoad: data,
   };
 }
 
@@ -65,7 +92,14 @@ export function downloadTemplate(id) {
       'get',
       `templates/demo-download/${id}`
     );
-    // dispatch(loadList(data));
+    dispatch(downloadUrl(data[0]));
+  };
+}
+
+export function downloadUrl(data) {
+  return {
+    type: DOWNLOAD_URL,
+    playLoad: data,
   };
 }
 
@@ -83,5 +117,51 @@ export function loadEditTemplate(_id) {
     }));
     console.log('load tempate call..............', data[0].texts, withIndex);
     dispatch(setAxisCall(withIndex));
+  };
+}
+
+export function update(fromData) {
+  return async (dispatch) => {
+    const data = await callHttpRequest('post', 'fonts/edit', fromData, true);
+    console.log(data, 'edit call.....');
+    if (data.status) {
+      dispatch(savedForm());
+    } else {
+      dispatch(loadError(data.error));
+    }
+  };
+}
+
+export function saveForm(fromData) {
+  return async (dispatch) => {
+    const data = await callHttpRequest(
+      'post',
+      'templates/save',
+      fromData,
+      true
+    );
+    console.log(data, '.ppopodata......');
+    if (data.status) {
+      dispatch(savedForm());
+    } else {
+      dispatch(loadError(data.error));
+    }
+  };
+}
+
+export function updateForm(fromData) {
+  return async (dispatch) => {
+    const data = await callHttpRequest(
+      'post',
+      'templates/edit',
+      fromData,
+      true
+    );
+    console.log(data, 'edit call.....');
+    if (data.status) {
+      dispatch(savedForm());
+    } else {
+      dispatch(loadError(data.error));
+    }
   };
 }

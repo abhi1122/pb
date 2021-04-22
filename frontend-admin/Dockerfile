@@ -1,11 +1,11 @@
-# FROM node:10.16.0
+FROM node:10.16.0
 
-# WORKDIR /usr/src/app/frontend-admin
+WORKDIR /usr/src/app/frontend-admin
 
-# COPY package*.json ./
+COPY package*.json ./
 
-# RUN npm install
+RUN npm install
 
-# EXPOSE 3000
+EXPOSE 3000
 
-# CMD ["npm", "start"]
+CMD ["npm", "start"]

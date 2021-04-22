@@ -6,6 +6,7 @@ import register from './register';
 import fonts from './fonts';
 import categories from './category';
 import template from './template';
+import core from './core';
 
 export default combineReducers({
   alerts,
@@ -15,4 +16,5 @@ export default combineReducers({
   fonts,
   categories,
   template,
+  core,
 });

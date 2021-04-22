@@ -2,25 +2,24 @@ import React from 'react';
 import {
   Row,
   Col,
-  Table,
-  Progress,
   Button,
-  UncontrolledButtonDropdown,
-  DropdownMenu,
-  DropdownToggle,
-  DropdownItem,
   Input,
   Label,
-  Badge,
   InputGroup,
   FormGroup,
   Alert,
   InputGroupAddon,
   InputGroupText,
+  UncontrolledAlert,
 } from 'reactstrap';
-import { getFonts, saveFonts } from '../../actions/fonts';
+import {
+  getFonts,
+  saveFonts,
+  editForm,
+  updateFonts,
+} from '../../actions/fonts';
 import { connect } from 'react-redux';
-import { withRouter, Redirect, Link } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import Widget from '../../components/Widget/Widget';
 import {
   InputValidationError,
@@ -32,80 +31,69 @@ import {
 class FontsAdd extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: '', fnt: {}, png: {}, fonts: [] };
+    this.state = { name: '', fnt: {}, png: {}, fonts: [], status: true };
   }
 
   componentDidMount() {
     if (this.props && this.props.match.params.id) {
-      this.props.dispatch(getFonts());
+      this.props.dispatch(
+        getFonts({ searchQuery: { _id: this.props.match.params.id } }, true)
+      );
     }
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    // console.log(nextProps, prevState);
-    // if (nextProps.saved) {
-    //   nextProps.history.push('admin/fonts/list');
-    // }
-  }
-
-  changeName = (event) => {
-    this.setState({ name: event.target.value });
+  changeName = (e) => {
+    //this.setState({ name: event.target.value });
+    this.props.dispatch(editForm({ name: e.target.value }));
   };
 
   onFileChange = (event) => {
     console.log(event.target.files, '...event.target.files');
-    this.setState({ fnt: event.target.files[0] });
+    //this.setState({ fnt: event.target.files[0] });
+    this.props.dispatch(editForm({ fnt: event.target.files[0] }));
     //this.setState({ fonts: [...this.state.fonts, event.target.files[0]] });
   };
 
   onFileChange2 = (event) => {
     //this.setState({ fonts: [...this.state.fonts, event.target.files[0]] });
-    this.setState({ png: event.target.files[0] });
+    //this.setState({ png: event.target.files[0] });
+    this.props.dispatch(editForm({ png: event.target.files[0] }));
     console.log(this.state, 'sate.....');
   };
 
   save = (e) => {
+    const { name, status, png, fnt, _id } = this.props.formData;
     e.preventDefault();
     const formData = new FormData();
-    formData.append('name', this.state.name);
-    formData.append('fonts', this.state.png);
-    formData.append('fonts', this.state.fnt);
-    this.props.dispatch(saveFonts(formData));
-    // let fontArr = [];
-    // fontArr.push(this.state.png);
-    // fontArr.push(this.state.fnt);
-    // this.setState({ fonts: fontArr }, () => {
-    //   console.log(this.state, '......this.state', fontArr);
-    //   this.props.dispatch(saveFonts(this.state));
-    // });
+    _id && formData.append('id', _id);
+    formData.append('name', name);
+    formData.append('status', status);
+    formData.append('fonts', png);
+    formData.append('fonts', fnt);
+    if (_id) {
+      this.props.dispatch(updateFonts(formData));
+    } else {
+      this.props.dispatch(saveFonts(formData));
+    }
+  };
 
-    // if (!this.isPasswordValid()) {
-    //   this.checkPassword();
-    // } else {
-    //   this.props.dispatch(
-    //     registerUser({
-    //       creds: {
-    //         email: this.state.email,
-    //         password: this.state.password,
-    //       },
-    //       history: this.props.history,
-    //     })
-    //   );
-    // }
+  changeCheck = (e) => {
+    //this.setState({ status: e.target.checked });
+    this.props.dispatch(editForm({ status: e.target.checked }));
   };
 
   render() {
+    const labelSlug = !this.props.formData._id ? 'Create' : 'Edit';
     if (this.props.saved) {
       return <Redirect to='/admin/fonts' />;
     }
-    console.log(this.props.fonts, '...this.props.fonts');
     return (
       <div>
         <Row>
           <Col>
             <Widget>
               <SectionHeader
-                headName='Add New Font'
+                headName={`${labelSlug} Font`}
                 headButtonName='Font List'
                 headButtonUrl='/admin/fonts'
                 props={this.props}
@@ -132,7 +120,7 @@ class FontsAdd extends React.Component {
                     <Input
                       id='name'
                       className='input-transparent pl-3'
-                      value={this.state.name}
+                      value={this.props.formData.name}
                       onChange={this.changeName}
                       type='text'
                       name='name'
@@ -185,14 +173,53 @@ class FontsAdd extends React.Component {
                 <br />
                 <br />
 
+                <FormGroup className='mt'>
+                  <div className='abc-checkbox'>
+                    <Input
+                      id='status'
+                      type='checkbox'
+                      checked={this.props.formData.status}
+                      onChange={(event) => this.changeCheck(event)}
+                    />
+
+                    <Label for='status' />
+                    <spam>Do you want to activate this</spam>
+                  </div>
+                </FormGroup>
+
+                <br />
+                <br />
+
                 <div className='bg-widget-transparent auth-widget-footer'>
                   <Button
-                    type='submit'
+                    onClick={() =>
+                      this.props.history.push({
+                        pathname: '/admin/fonts',
+                        state: {},
+                      })
+                    }
                     color='danger'
                     className='auth-btn'
-                    style={{ color: '#fff' }}
+                    //size='lg'
+                    style={{
+                      color: '#fff',
+                      float: 'right',
+                      marginLeft: '20px',
+                    }}
                   >
-                    {this.props.isFetching ? 'Loading...' : 'Create'}
+                    {this.props.isFetching ? 'Loading...' : 'CANCEL'}
+                  </Button>
+                  <Button
+                    type='submit'
+                    color='success'
+                    className='auth-btn'
+                    //size='lg'
+                    style={{
+                      color: '#fff',
+                      float: 'right',
+                    }}
+                  >
+                    {this.props.isFetching ? 'Loading...' : 'SAVE'}
                   </Button>
                 </div>
               </form>
@@ -208,6 +235,7 @@ function mapStateToProps(state) {
   return {
     saved: state.fonts.saved,
     errors: state.fonts.errors,
+    formData: state.fonts.formData,
   };
 }
 

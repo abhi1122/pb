@@ -144,7 +144,7 @@ class Header extends React.Component {
             <BurgerIcon className={s.headerIcon} />
           </NavLink>
         </div>
-        <div className={`d-print-none ${s.root}`}>
+        {/* <div className={`d-print-none ${s.root}`}>
           <UncontrolledAlert
             className={`${s.alert} mr-3 d-lg-down-none animate__animated animate__bounceIn animate__delay-1s`}
           >
@@ -157,7 +157,7 @@ class Header extends React.Component {
             </button>{' '}
             on the right!
           </UncontrolledAlert>
-        </div>
+        </div> */}
         <div className={`d-print-none ${s.root}`}>
           <Nav className='ml-md-0'>
             <NavItem>

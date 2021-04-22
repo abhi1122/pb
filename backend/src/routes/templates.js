@@ -48,7 +48,7 @@ var modalObj = new Templates();
  *           items:
  *             $ref: '#/definitions/catSaveResp'
  */
-router.post('/save', upload.none(), async (req, res, next) => {
+router.post('/save', async (req, res, next) => {
   try {
     const response = await modalObj.save(req);
     res.send(createResponse(response, req, res));
@@ -57,7 +57,16 @@ router.post('/save', upload.none(), async (req, res, next) => {
   }
 });
 
-router.post('/update', upload.none(), async (req, res, next) => {
+router.post('/edit', async (req, res, next) => {
+  try {
+    const response = await modalObj.edit(req);
+    res.send(createResponse(response, req, res));
+  } catch (error) {
+    res.send(createError(error, res, res));
+  }
+});
+
+router.post('/update', async (req, res, next) => {
   try {
     const response = await modalObj.update(req);
     res.send(createResponse(response, req, res));
@@ -69,6 +78,7 @@ router.post('/update', upload.none(), async (req, res, next) => {
 router.get('/demo-download/:id', upload.none(), async (req, res, next) => {
   try {
     const response = await modalObj.demoDownload(req);
+    console.log(response, '...........response');
     res.send(createResponse(response, req, res));
   } catch (error) {
     res.send(createError(error, res, res));

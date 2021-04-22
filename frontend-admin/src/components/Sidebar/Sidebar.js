@@ -19,7 +19,7 @@ import ComponentsIcon from '../Icons/SidebarIcons/ComponentsIcon';
 const menuItems = [
   { header: 'Fonts Manager', url: '/admin/fonts' },
   { header: 'Category Manager', url: '/admin/categories' },
-  { header: 'Template Manager', url: '/admin/templates' },
+  { header: 'Template Manager', url: '/admin/template' },
 ];
 
 class Sidebar extends React.Component {
@@ -86,9 +86,7 @@ class Sidebar extends React.Component {
         }}
       >
         <header className={s.logo}>
-          <a href='https://demo.flatlogic.com/light-blue-react/'>
-            Light <span className='fw-bold'>Blue</span>
-          </a>
+          Light <span className='fw-bold'>Blue</span>
         </header>
         <ul className={s.nav}>
           <LinksGroup
@@ -99,7 +97,7 @@ class Sidebar extends React.Component {
             header='Dashboard'
             isHeader
             iconName={<HomeIcon className={s.menuIcon} />}
-            link='/app/main'
+            link='/admin/dashboard'
             index='main'
           />
           <h5 className={[s.navTitle, s.groupTitle].join(' ')}>APP MANAGER</h5>

@@ -4,7 +4,7 @@ import { fontsModel } from '../../models/Fonts';
 // import default from "../../utils/helper/";
 // const { parseMongoError } = default;
 import { fontUploadConfig } from '../../../config/constants/index';
-import { getQueryBody } from '../../utils/helper';
+import { getQueryBody, getHeaderBody } from '../../utils/helper';
 var fs = require('fs');
 
 class Fonts {
@@ -16,21 +16,13 @@ class Fonts {
   }
 
   async save(req, res) {
-    // try {
-    await fontUploader(
-      req,
-      fontUploadConfig.name,
-      fontUploadConfig.files,
-      fontUploadConfig.destination,
-      res
-    );
+    const headBody = getHeaderBody(req);
+    const checkValid = new fontsModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
 
-    console.log(req.fileUploadError, '....uploadFile req.fileUploadError');
+    await fontUploader(req, fontUploadConfig.name, fontUploadConfig.files);
     if (!req.fileUploadError.status) {
-      // const fileMove = await fs.move(
-      //   'uploads/fonts' + req.files.originalname,
-      //   `uploads/fonts/${Date.now()}` + req.files.originalname
-      // );
       const files = [...req.files];
       const folderName = Date.now();
       fs.mkdirSync(`uploads/fonts/${folderName}/`);
@@ -39,8 +31,6 @@ class Fonts {
         fs.rename(file.path, newFolder, (err) => console.log(err));
         return { ...file, path: newFolder };
       });
-      console.log(req.body.fonts, '....req.body.fonts');
-      //req.body.fonts = req.files;
       const doc = new fontsModel(req.body);
       return await doc.save(req.body);
     } else {
@@ -48,15 +38,45 @@ class Fonts {
       newErr.error = { fonts: req.fileUploadError.message };
       newErr.error_code = 'FILE_UPLOAD';
       throw newErr;
-
-      //throw Error({ fonts: req.fileUploadError.message });
-
-      //return { statusCode: 400, message: req.fileUploadError.message };
     }
-    // } catch (err) {
-    //   console.log('eroooo........');
-    //   return err;
-    // }
+  }
+
+  async edit(req, res) {
+    const headBody = getHeaderBody(req);
+    const checkValid = new fontsModel(headBody);
+    const error = checkValid.validateSync();
+    if (error) throw error;
+
+    await fontUploader(
+      req,
+      fontUploadConfig.name,
+      fontUploadConfig.files,
+      true
+    );
+
+    if (!req.fileUploadError.status) {
+      const files = [...req.files];
+      const folderName = Date.now();
+      fs.mkdirSync(`uploads/fonts/${folderName}/`);
+      req.body.fonts = files.map((file) => {
+        const newFolder = `uploads/fonts/${folderName}/` + file.originalname;
+        fs.rename(file.path, newFolder, (err) => console.log(err));
+        return { ...file, path: newFolder };
+      });
+
+      const { id } = req.body;
+      delete req.body.id;
+      //const doc = new fontsModel(req.body);
+      return await fontsModel.updateMany(
+        { _id: id },
+        { $set: { ...req.body } }
+      );
+    } else {
+      let newErr = new Error(req.fileUploadError.message);
+      newErr.error = { fonts: req.fileUploadError.message };
+      newErr.error_code = 'FILE_UPLOAD';
+      throw newErr;
+    }
   }
 
   //   async getAll(req) {
