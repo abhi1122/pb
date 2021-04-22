@@ -1,0 +1,22 @@
+// :export {
+//   primary: #5117c2;
+//   --color-secondary: #DD0000;
+//   --color-additional: #FFCE00;
+//   // $spacer-xs: 4px;
+//   // $spacer-s: 8px;
+//   // $spacer-m: 12px;
+//   // $spacer-l: 17px;
+//   // $spacer-xl: 28px;
+// }
+
+$color: black;
+$primaryColor: red;
+$backGroundColor:#5117c2;
+$textPrimaryColor:white;
+
+:export {
+    color: $color;
+    primary: $primaryColor;
+    backGroundColor: $backGroundColor;
+    textPrimaryColor: $textPrimaryColor;
+}
