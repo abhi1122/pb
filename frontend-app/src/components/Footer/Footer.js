@@ -10,6 +10,9 @@ import LocationOnIcon from "@material-ui/icons/LocationOn";
 const useStyles = makeStyles({
   root: {
     width: "100%",
+    position: "fixed",
+    bottom: 0,
+    background: "#3f51b5",
   },
 });
 

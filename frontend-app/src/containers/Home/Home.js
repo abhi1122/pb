@@ -61,7 +61,6 @@ function Home(props) {
   return (
     <>
       <ComponentWrapper>
-        <Header />
         <Banner />
         <Grid container className={classes.root}>
           <Grid item xs={12} className={classes.paper}>
@@ -69,7 +68,13 @@ function Home(props) {
               <span className={classes.title}>Select your business</span>
             </h4>
           </Grid>
-          {["Hotel.PNG", "HealthService.PNG", "YogaCapture.PNG"].map((img) => (
+          {[
+            "Hotel.PNG",
+            "HealthService.PNG",
+            "YogaCapture.PNG",
+            "HealthService.PNG",
+            "YogaCapture.PNG",
+          ].map((img) => (
             <Grid item xs={12} sm={6}>
               <div className={classes.business}>
                 <img src={img} className={classes.businessImg} />
@@ -77,7 +82,6 @@ function Home(props) {
             </Grid>
           ))}
         </Grid>
-        <Footer />
       </ComponentWrapper>
     </>
   );

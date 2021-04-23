@@ -11,6 +11,7 @@ import reducers from "./redux/reducers";
 import "./index.css";
 import Home from "./containers/Home/Home";
 import reportWebVitals from "./reportWebVitals";
+import App from "./components/App";
 
 export const store = createStore(
   reducers,
@@ -23,7 +24,7 @@ ReactDOM.render(
       <Router>
         <Switch>
           <Route exact path="/">
-            <Home />
+            <App />
           </Route>
           {/* <Route path="/about">
           <About />
