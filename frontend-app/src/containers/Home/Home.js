@@ -1,5 +1,5 @@
 import ComponentWrapper from "../../components/ComponentWrapper/ComponentWrapper";
-import Header from "../../components/Header/Header";
+import Banner from "../../components/Banner/Banner";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -50,7 +50,7 @@ function Home() {
   return (
     <>
       <ComponentWrapper>
-        <Header />
+        <Banner />
         <Grid container className={classes.root}>
           <Grid item xs={12} className={classes.paper}>
             <h4>

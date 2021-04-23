@@ -3,17 +3,13 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
   root: {
-    //  background: "#9017c2",
+    background: "#5117c2",
   },
 });
 
 function ComponentWrapper(props) {
   const classes = useStyles();
-  return (
-    <Container maxWidth="lg">
-      <div className={classes.root}>{props.children}</div>
-    </Container>
-  );
+  return <div className={classes.root}>{props.children}</div>;
 }
 
 export default ComponentWrapper;

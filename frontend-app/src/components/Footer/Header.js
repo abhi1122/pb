@@ -4,16 +4,16 @@ import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles({
   root: {
-    // marginBottom: "-4px",
+    marginBottom: "-4px",
     width: "100%",
     height: "200px",
     "max-height": "250px",
   },
 });
 
-function Banner(props) {
+function Header(props) {
   const classes = useStyles();
   return <img src="logo/logo.PNG" className={classes.root} />;
 }
 
-export default Banner;
+export default Header;
