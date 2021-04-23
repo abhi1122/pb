@@ -36,7 +36,7 @@ http.interceptors.response.use(
   }
 );
 
-axios.defaults.baseURL = 'http://localhost:3007';
+axios.defaults.baseURL = config.SERVER_URL;
 axios.defaults.headers.common['Authorization'] = '';
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
 
