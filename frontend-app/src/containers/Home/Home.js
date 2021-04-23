@@ -10,6 +10,7 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import variables from "../../styles/globalStyles.module.scss";
 import { getCategoryList } from "../../redux/actions/category";
+import { CloudImage } from "../../components/CloudImage/CloudImage";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,17 +67,18 @@ function Home(props) {
           <Grid item xs={12} className={classes.paper}>
             <strong>Select your business</strong>
           </Grid>
-          {[
-            "1 Hotels & Restaurants.jpg",
-            "2 Doctors, Labs & Hospitals.jpg",
-            "3 Yoga Training & Classes.jpg",
-          ].map((img) => (
+          {props.categoryList.map((img) => (
             <Grid item xs={12} sm={6}>
               <div className={classes.business}>
-                <img
+                <CloudImage
+                  publicId={img.file.public_id}
+                  height="150px"
+                  width="100%"
+                />
+                {/* <img
                   src={`Main Categories/${img}`}
                   className={classes.businessImg}
-                />
+                /> */}
               </div>
             </Grid>
           ))}
