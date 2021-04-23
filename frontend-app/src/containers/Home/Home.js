@@ -9,6 +9,7 @@ import Footer from "../../components/Footer/Footer";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import variables from "../../styles/globalStyles.module.scss";
+import { getCategoryList } from "../../redux/actions/category";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,9 +49,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home(props) {
-  console.log(props.data, ".......props");
+  console.log(props.categoryList, ".......categoryList");
   useEffect(() => {
-    props.dispatch(addCore({ name: "abhi" }));
+    props.dispatch(getCategoryList({ searchQuery: { parentId: null } }));
     // Update the document title using the browser API
     //document.title = `You clicked ${count} times`;
   }, []);
@@ -86,7 +87,7 @@ function Home(props) {
 }
 
 function mapStateToProps(state) {
-  return { data: state.core };
+  return { categoryList: state.category.list };
 }
 
 export default connect(mapStateToProps)(Home);

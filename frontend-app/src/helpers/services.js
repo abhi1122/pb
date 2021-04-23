@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '../../src/index';
-import { addCore } from '../actions/core';
+import { addCore } from '../redux/actions/core';
+import config from '../config';
 
 // const instance = axios.create({
 //   baseURL: 'https://some-domain.com/api/',
@@ -9,7 +10,7 @@ import { addCore } from '../actions/core';
 // });
 
 const http = axios.create({
-  baseURL: 'http://localhost:3007',
+  baseURL: config.SERVER_URL,
   // timeout: 1000,
   headers: { 'Content-Type': 'multipart/form-data' },
 });
