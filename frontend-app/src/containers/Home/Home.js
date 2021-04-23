@@ -20,9 +20,11 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "uppercase",
     textAlign: "center",
     color: variables.textPrimaryColor,
+    height: "36px",
+    paddingTop: "5px",
   },
   business: {
-    padding: "0px 5px 5px 5px",
+    padding: "3px 1px",
     // padding: theme.spacing(1),
     textAlign: "center",
     backgroundColor: variables.backGroundColor,
@@ -34,17 +36,14 @@ const useStyles = makeStyles((theme) => ({
   businessImg: {
     borderRadius: "5px",
     width: "100%",
-    height: "130px",
+    height: "150px",
+    border: "1px solid #fff",
     // "max-height": "130px",
     ["@media (min-width:780px)"]: {
       // eslint-disable-line no-useless-computed-key
       height: "250px",
     },
     "&:hover": { transform: "scale3d(1, 1.05, 0.1)" },
-  },
-  title: {
-    padding: "4px 20px",
-    border: `1px solid ${variables.textPrimaryColor}`,
   },
 }));
 
@@ -61,23 +60,22 @@ function Home(props) {
   return (
     <>
       <ComponentWrapper>
-        <Banner />
+        <Banner props={{ imgPath: "Main Categories/Poster_Babu Banner.jpg" }} />
         <Grid container className={classes.root}>
           <Grid item xs={12} className={classes.paper}>
-            <h4>
-              <span className={classes.title}>Select your business</span>
-            </h4>
+            <strong>Select your business</strong>
           </Grid>
           {[
-            "Hotel.PNG",
-            "HealthService.PNG",
-            "YogaCapture.PNG",
-            "HealthService.PNG",
-            "YogaCapture.PNG",
+            "1 Hotels & Restaurants.jpg",
+            "2 Doctors, Labs & Hospitals.jpg",
+            "3 Yoga Training & Classes.jpg",
           ].map((img) => (
             <Grid item xs={12} sm={6}>
               <div className={classes.business}>
-                <img src={img} className={classes.businessImg} />
+                <img
+                  src={`Main Categories/${img}`}
+                  className={classes.businessImg}
+                />
               </div>
             </Grid>
           ))}

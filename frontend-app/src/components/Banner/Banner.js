@@ -11,9 +11,10 @@ const useStyles = makeStyles({
   },
 });
 
-function Banner(props) {
+function Banner({ props }) {
+  console.log(props, "props banner");
   const classes = useStyles();
-  return <img src="logo/logo.PNG" className={classes.root} />;
+  return <img src={`${props.imgPath}`} className={classes.root} />;
 }
 
 export default Banner;

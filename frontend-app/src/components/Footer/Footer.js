@@ -6,13 +6,14 @@ import FolderIcon from "@material-ui/icons/Folder";
 import RestoreIcon from "@material-ui/icons/Restore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
+import variables from "../../styles/globalStyles.module.scss";
 
 const useStyles = makeStyles({
   root: {
     width: "100%",
     position: "fixed",
     bottom: 0,
-    background: "#3f51b5",
+    background: variables.footerColor,
   },
 });
 
@@ -33,22 +34,22 @@ export default function LabelBottomNavigation() {
       <BottomNavigationAction
         label="Recents"
         value="recents"
-        icon={<RestoreIcon />}
+        icon={<RestoreIcon color="white" />}
       />
       <BottomNavigationAction
         label="Favorites"
         value="favorites"
-        icon={<FavoriteIcon />}
+        icon={<FavoriteIcon color="white" />}
       />
       <BottomNavigationAction
         label="Nearby"
         value="nearby"
-        icon={<LocationOnIcon />}
+        icon={<LocationOnIcon color="white" />}
       />
       <BottomNavigationAction
         label="Folder"
         value="folder"
-        icon={<FolderIcon />}
+        icon={<FolderIcon color="white" />}
       />
     </BottomNavigation>
   );

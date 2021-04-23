@@ -1,9 +1,10 @@
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
+import variables from "../../styles/globalStyles.module.scss";
 
 const useStyles = makeStyles({
   root: {
-    background: "#5117c2",
+    background: variables.backGroundColor,
   },
 });
 

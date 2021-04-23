@@ -11,12 +11,16 @@
 
 $color: black;
 $primaryColor: red;
-$backGroundColor:#5117c2;
+$backGroundColor:#722cb8;
 $textPrimaryColor:white;
+$headerColor:#150a0a;
+$footerColor:#000000a8;
 
 :export {
     color: $color;
     primary: $primaryColor;
     backGroundColor: $backGroundColor;
     textPrimaryColor: $textPrimaryColor;
+    headerColor: $headerColor;
+    footerColor: $footerColor;
 }
