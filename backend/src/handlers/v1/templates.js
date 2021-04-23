@@ -149,7 +149,7 @@ export class Templates {
     }
   }
 
-  async demoDownload(req) {
+  async demoDownloadOld(req) {
     const templateData = await templatesModel.findOne({ _id: req.params.id });
     //fontsModel.findOne({ _id: templateData.id })
     // image.composite( src, x, y, [{ mode, opacitySource, opacityDest }] );
@@ -217,6 +217,65 @@ export class Templates {
         //   .catch((err) => console.log(err));
 
         // return new Promise({ url: `public/img-load/${req.params.id}.jpeg` });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    return new Promise((resolve) =>
+      resolve({
+        url: `${req.protocol}://${req.get('host')}/img-load/demo-template.jpeg`,
+      })
+    );
+  }
+
+  async demoDownload(req) {
+    const templateData = await templatesModel.findOne({ _id: req.params.id });
+    const {
+      texts,
+      url,
+      logo: [logoPos],
+    } = templateData;
+    await Jimp.read(url)
+      .then(async (image) => {
+        const promiseArr = [];
+        console.log(logoPos, '..........logoPos');
+        if (logoPos.slug !== 'none') {
+          const { width, height } = image.bitmap;
+          const logo = await Jimp.read(`public/images/logo.png`);
+          const logoWidth = logo.bitmap.width;
+          const logoHeight = logo.bitmap.height;
+          console.log(width, height, '.....width, height');
+          console.log(logoWidth, logoHeight, '.....logo');
+          const logoAxis = this.getLogoAxis(
+            width,
+            height,
+            logoWidth,
+            logoHeight,
+            logoPos.slug
+          );
+          console.log(logoAxis, '.......logoAxis');
+          promiseArr.push(image.composite(logo, logoAxis.x, logoAxis.y));
+        }
+
+        const testPromiss = texts.map(async (text) => {
+          const fontsData = await fontsModel.findOne({
+            _id: text.font,
+          });
+          const selectedFont = fontsData.fonts.find(
+            (font) => font.mimetype === 'application/octet-stream'
+          );
+          console.log(fontsData.name, '.....fontsData');
+          const loadFont = await Jimp.loadFont(selectedFont.path);
+          image
+            .print(loadFont, Number(text.x), Number(text.y), text.text)
+            .write(`public/img-load/demo-template.jpeg`);
+        });
+
+        Promise.all([...promiseArr, ...testPromiss]).then((values) => {
+          console.log(values);
+          resolve({ url: `public/img-load/demo-template.jpeg` });
+        });
       })
       .catch((err) => {
         console.error(err);

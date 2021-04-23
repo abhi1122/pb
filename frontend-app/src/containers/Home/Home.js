@@ -1,7 +1,11 @@
+import React, { useEffect } from "react";
+import { addCore } from "../../redux/actions/core";
+import { connect } from "react-redux";
 import ComponentWrapper from "../../components/ComponentWrapper/ComponentWrapper";
 import Banner from "../../components/Banner/Banner";
-import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import variables from "../../styles/globalStyles.module.scss";
@@ -44,12 +48,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Home() {
+function Home(props) {
+  console.log(props.data, ".......props");
+  useEffect(() => {
+    props.dispatch(addCore({ name: "abhi" }));
+    // Update the document title using the browser API
+    //document.title = `You clicked ${count} times`;
+  }, []);
+
   const classes = useStyles();
   console.log(variables, "hreeeeeeee");
   return (
     <>
       <ComponentWrapper>
+        <Header />
         <Banner />
         <Grid container className={classes.root}>
           <Grid item xs={12} className={classes.paper}>
@@ -65,9 +77,14 @@ function Home() {
             </Grid>
           ))}
         </Grid>
+        <Footer />
       </ComponentWrapper>
     </>
   );
 }
 
-export default Home;
+function mapStateToProps(state) {
+  return { data: state.core };
+}
+
+export default connect(mapStateToProps)(Home);
