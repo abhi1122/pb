@@ -1,28 +1,42 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import ReduxThunk from 'redux-thunk';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
-import "./index.css";
-import Home from "./containers/Home/index";
-import reportWebVitals from "./reportWebVitals";
+import reducers from './redux/reducers';
+
+import './index.css';
+import Home from './containers/Home/index';
+import reportWebVitals from './reportWebVitals';
+
+export const store = createStore(
+  reducers,
+  composeWithDevTools(applyMiddleware(ReduxThunk))
+);
+
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        {/* <Route path="/about">
+  <Provider store={store}>
+    <React.StrictMode>
+      <Router>
+        <Switch>
+          <Route exact path='/'>
+            <Home />
+          </Route>
+          {/* <Route path="/about">
           <About />
         </Route>
         <Route path="/dashboard">
           <Dashboard />
         </Route> */}
-      </Switch>
-      {/* <App /> */}
-    </Router>
-  </React.StrictMode>,
-  document.getElementById("root")
+        </Switch>
+        {/* <App /> */}
+      </Router>
+    </React.StrictMode>
+  </Provider>,
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
