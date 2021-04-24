@@ -4,14 +4,11 @@ import { connect } from 'react-redux';
 import ComponentWrapper from '../../components/ComponentWrapper/ComponentWrapper';
 import Banner from '../../components/Banner/Banner';
 import { makeStyles } from '@material-ui/core/styles';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import variables from '../../styles/globalStyles.module.scss';
 import { getCategoryList } from '../../redux/actions/category';
 import { CloudImage } from '../../components/CloudImage/CloudImage';
-import config from '../../config';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,11 +20,11 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'uppercase',
     textAlign: 'center',
     color: variables.textPrimaryColor,
-    height: '36px',
+    height: '40px',
     paddingTop: '5px',
   },
   business: {
-    padding: '3px 1px',
+    padding: '5px 5px',
     // padding: theme.spacing(1),
     textAlign: 'center',
     backgroundColor: variables.backGroundColor,
@@ -35,6 +32,10 @@ const useStyles = makeStyles((theme) => ({
       // eslint-disable-line no-useless-computed-key
       padding: '0px 10px 15px 10px',
     },
+  },
+  title: {
+    border: '1px solid #fff',
+    padding: '3px 15px',
   },
   businessImg: {
     borderRadius: '5px',
@@ -44,16 +45,22 @@ const useStyles = makeStyles((theme) => ({
     // "max-height": "130px",
     ['@media (min-width:780px)']: {
       // eslint-disable-line no-useless-computed-key
-      height: '300px',
+      height: '250px',
     },
     '&:hover': { transform: 'scale3d(1, 1.05, 0.1)' },
   },
 }));
 
-function Home(props) {
+function Category(props) {
   console.log(props.categoryList, '.......categoryList');
+
   useEffect(() => {
-    props.dispatch(getCategoryList({ searchQuery: { parentId: null } }));
+    console.log(props.match.params);
+    if (props.match.params && props.match.params.id) {
+      props.dispatch(
+        getCategoryList({ searchQuery: { parentId: props.match.params.id } })
+      );
+    }
     // Update the document title using the browser API
     //document.title = `You clicked ${count} times`;
   }, []);
@@ -67,22 +74,29 @@ function Home(props) {
   return (
     <>
       <ComponentWrapper>
-        <Banner props={{ imgPath: config.APP_IMAGES.HOME_BANNER }} />
-        {/* <Banner props={{ imgPath: "Main Categories/Poster_Babu Banner.jpg" }} /> */}
+        <Banner props={{ imgPath: props.selectedCategory.url }} />
+        {/* <CloudImage
+          publicId={props.selectedCategory.url}
+          height="150"
+          width="150"
+        /> */}
+
         <Grid container className={classes.root}>
           <Grid item xs={12} className={classes.paper}>
-            <strong>Select your business</strong>
+            <div>
+              <span className={classes.title}>Choose Your Event </span>
+            </div>
           </Grid>
           {props.categoryList.map((img) => (
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={6} sm={3}>
               <div
                 className={classes.business}
                 onClick={() => handleClick(img._id)}
               >
                 <CloudImage
                   publicId={img.file.public_id}
-                  height='150'
-                  width='100%'
+                  height='300'
+                  width='300'
                   className={classes.businessImg}
                 />
                 {/* <img
@@ -97,9 +111,11 @@ function Home(props) {
     </>
   );
 }
-
 function mapStateToProps(state) {
-  return { categoryList: state.category.list };
+  return {
+    categoryList: state.category.list,
+    selectedCategory: state.category.self,
+  };
 }
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(Category);

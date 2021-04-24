@@ -17,3 +17,16 @@ export function getTemplate(query, isEdit = false) {
     dispatch(loadList(data));
   };
 }
+
+export function createTemplate(query, isEdit = false) {
+  return async (dispatch) => {
+    const {
+      data: [data],
+    } = await callHttpRequestWithLoading(
+      'post',
+      'templates/create-template',
+      query
+    );
+    dispatch(loadList(data));
+  };
+}

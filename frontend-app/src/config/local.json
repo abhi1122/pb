@@ -3,5 +3,9 @@
   "THEME_COLORS": {
     "PRIMARY": "#007bff",
     "SECONDARY": "#fc3"
+  },
+  "APP_IMAGES": {
+    "HOME_BANNER": "https://res.cloudinary.com/dp536vvok/image/upload/v1619183994/poster-babu-app/Poster_Babu_Banner_uyi3nl.jpg",
+    "LOGO": "https://res.cloudinary.com/dp536vvok/image/upload/v1619184003/poster-babu-app/Logo_lgl5ts.png"
   }
 }

@@ -7,6 +7,7 @@ import Home from '../../containers/Home/Home';
 import CreateTemplate from '../../containers/Template/CreateTemplate/CreateTemplate';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
+import Category from '../../containers/Category/Category';
 
 class Layout extends React.Component {
   // constructor(props) {
@@ -30,6 +31,7 @@ class Layout extends React.Component {
             exact
             component={CreateTemplate}
           />
+          <Route path='/category/:id' exact component={Category} />
           {/* <Route path="/admin/fonts" exact component={Fonts} />
           <Route path="/admin/fonts/add" exact component={FontsAdd} />
           <Route path="/admin/fonts/edit/:id" component={FontsAdd} />
