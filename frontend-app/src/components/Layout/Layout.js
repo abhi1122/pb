@@ -6,6 +6,7 @@ import { Switch, Route, withRouter, Redirect } from "react-router";
 import Home from "../../containers/Home/Home";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
+import Category from "../../containers/Category/Category";
 
 class Layout extends React.Component {
   constructor(props) {
@@ -24,6 +25,7 @@ class Layout extends React.Component {
             render={() => <Redirect to="/admin/dashboard" />}
           /> */}
           <Route path="/home" exact component={Home} />
+          <Route path="/category/:id" exact component={Category} />
           {/* <Route path="/admin/fonts" exact component={Fonts} />
           <Route path="/admin/fonts/add" exact component={FontsAdd} />
           <Route path="/admin/fonts/edit/:id" component={FontsAdd} />

@@ -34,7 +34,8 @@ export default function LabelBottomNavigation() {
       <BottomNavigationAction
         label="Recents"
         value="recents"
-        icon={<RestoreIcon color="white" />}
+        color="white"
+        icon={<RestoreIcon />}
       />
       <BottomNavigationAction
         label="Favorites"
