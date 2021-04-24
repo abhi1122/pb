@@ -1,29 +1,35 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Switch, Route, withRouter, Redirect } from "react-router";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Switch, Route, withRouter, Redirect } from 'react-router';
 
-import Home from "../../containers/Home/Home";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
+import Home from '../../containers/Home/Home';
+import CreateTemplate from '../../containers/Template/CreateTemplate/CreateTemplate';
+import Header from '../Header/Header';
+import Footer from '../Footer/Footer';
 
 class Layout extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+  // constructor(props) {
+  //   super(props);
+  // }
 
   render() {
     return (
       <div>
         <Header />
         <Switch>
-          <Route path="/" exact render={() => <Redirect to="/home" />} />
+          <Route path='/' exact render={() => <Redirect to='/home' />} />
           {/* <Route
             path="/admin"
             exact
             render={() => <Redirect to="/admin/dashboard" />}
           /> */}
-          <Route path="/home" exact component={Home} />
+          <Route path='/home' exact component={Home} />
+          <Route
+            path='/create-template/:templateId'
+            exact
+            component={CreateTemplate}
+          />
           {/* <Route path="/admin/fonts" exact component={Fonts} />
           <Route path="/admin/fonts/add" exact component={FontsAdd} />
           <Route path="/admin/fonts/edit/:id" component={FontsAdd} />

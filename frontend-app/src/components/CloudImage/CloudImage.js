@@ -17,9 +17,14 @@ export const CloudImage = ({ publicId, width, height, className }) => {
   // );
   return (
     <img
-      src={cloudinaryCore.url(publicId)}
-      width={width}
-      height={height}
+      alt=''
+      src={cloudinaryCore.url(publicId, {
+        width: 100,
+        height: 100,
+        //crop: 'fit',
+      })}
+      //width={width}
+      //height={height}
       className={className}
     />
   );
